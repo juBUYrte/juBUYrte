@@ -15,5 +15,8 @@ module.exports = {
     'prefer-destructuring': 0,
     'no-console': 0,
     'linebreak-style': 'off',
+    'import/no-unresolved': 'off',
+    'max-classes-per-file': 'off',
+    'no-underscore-dangle': 'off',
   },
 };

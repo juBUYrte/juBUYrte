@@ -1,32 +1,24 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+// import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import passport from 'passport';
 import Account from '../models/Account.js';
+import goToken from '../authentication/auth.js';
 
 dotenv.config();
 
 class AccountController {
-  static loginAccount = async (req, res) => {
-    const user = await Account.findOne({ email: req.body.email });
-    if (!user) {
-      return res.status(400).json({ message: 'Dados inválidos' });
-    }
-    const compareSenha = await bcrypt.compare(req.body.senha, user.senha);
-
-    if (!compareSenha) {
-      return res.status(400).json({ message: 'Dados inválidos' });
-    }
-
-    const tokenjwt = jwt.sign(
-      { idUser: user.id },
-      process.env.SECRET_KEY,
-      {
-        subject: user.id.toString(),
-        expiresIn: process.env.EXPIRES_IN,
-      },
-    );
-
-    return res.status(200).json({ token: tokenjwt });
+  static loginAccount = async (req, res, next) => {
+    passport.authenticate('local', { session: false }, (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        res.status(400).json({ message: info.message });
+      }
+      const token = goToken(user._id);
+      return res.status(204).header('Authorization', `Bearer ${token}`).send();
+    })(req, res, next);
   };
 
   static findAccounts = (_req, res) => {
@@ -52,25 +44,28 @@ class AccountController {
   };
 
   static createAccount = async (req, res) => {
-    const userEmail = await Account.findOne({ email: req.body.email });
+    const { nome, email, senha } = req.body;
+    const userEmail = await Account.findOne({ email });
     if (userEmail) {
-      return res.status(400).json({ message: 'Email already exists' });
+      return res.status(409).json({ message: 'Email already exists' });
     }
 
-    const salt = 12;
-    const hasPassword = bcrypt.hashSync(req.body.senha, salt);
-    req.body.senha = hasPassword;
+    const salt = await bcrypt.genSalt(12);
+
+    const hastSenha = await bcrypt.hash(senha, salt);
     const account = new Account({
-      ...req.body,
+      nome,
+      email,
+      senha: hastSenha,
       createdDate: Date(),
     });
-    account.save((err, newAccount) => {
-      if (err) {
-        return res.status(500).send({ message: err.message });
-      }
-      return res.status(201).set('Location', `/admin/accounts/${account.id}`).json(newAccount);
-    });
-    return '';
+
+    try {
+      await account.save();
+      return res.status(201).set('Location', `/admin/accounts/${account.id}`).json(account);
+    } catch (error) {
+      return res.status(500).send({ message: error.message });
+    }
   };
 
   static updateAccount = async (req, res) => {
