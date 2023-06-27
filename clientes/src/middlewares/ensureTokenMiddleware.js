@@ -10,10 +10,11 @@ const ensureTokenMiddleware = (req, res, next) => {
   }
 
   const tokenJWT = token.split(' ')[1];
-  jwt.verify(tokenJWT, process.env.SECRET_KEY, (error) => {
+  jwt.verify(tokenJWT, process.env.SECRET_KEY, (error, decoded) => {
     if (error) {
       return res.status(401).json({ message: error.message });
     }
+    req.idUser = decoded.idUser;
 
     return next();
   });

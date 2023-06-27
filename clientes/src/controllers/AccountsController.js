@@ -52,6 +52,11 @@ class AccountController {
   };
 
   static createAccount = async (req, res) => {
+    const userEmail = await Account.findOne({ email: req.body.email });
+    if (userEmail) {
+      return res.status(400).json({ message: 'Email already exists' });
+    }
+
     const salt = 12;
     const hasPassword = bcrypt.hashSync(req.body.senha, salt);
     req.body.senha = hasPassword;
@@ -65,10 +70,19 @@ class AccountController {
       }
       return res.status(201).set('Location', `/admin/accounts/${account.id}`).json(newAccount);
     });
+    return '';
   };
 
-  static updateAccount = (req, res) => {
+  static updateAccount = async (req, res) => {
     const { id } = req.params;
+    const emailBody = req.body.email;
+
+    if (emailBody) {
+      const userEmail = await Account.findOne({ email: emailBody });
+      if (userEmail) {
+        return res.status(400).json({ message: 'Email already exists' });
+      }
+    }
 
     Account.findByIdAndUpdate(id, { $set: req.body }, { new: true }, (err, account) => {
       if (err) {
@@ -76,14 +90,18 @@ class AccountController {
       }
       return res.status(204).set('Location', `/admin/accounts/${account.id}`).send();
     });
+    return '';
   };
 
   static deleteAccount = (req, res) => {
     const { id } = req.params;
 
-    Account.findByIdAndDelete(id, (err) => {
+    Account.findByIdAndDelete(id, (err, account) => {
       if (err) {
         return res.status(500).send({ message: err.message });
+      }
+      if (!account) {
+        return res.status(404).json();
       }
       return res.status(204).send({ message: 'Account successfully deleted' });
     });
