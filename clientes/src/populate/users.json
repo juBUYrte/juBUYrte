@@ -17,7 +17,7 @@
             "numero": "1234432156788765",
             "nome": "Ana C Lima",
             "validade": "12/30",
-            "codigo": "789",
+            "codigo": 789,
             "vencimento": "12"
         }
     },
@@ -39,7 +39,7 @@
             "numero": "5479122156658754",
             "nome": "Paula M Bittencourt",
             "validade": "02/31",
-            "codigo": "942",
+            "codigo": 942,
             "vencimento": "06"
         }
     },   
@@ -61,7 +61,7 @@
             "numero": "1234432156788745",
             "nome": "Ada Lovelace",
             "validade": "12/27",
-            "codigo": "266",
+            "codigo": 266,
             "vencimento": "18"
         }
     },
@@ -83,7 +83,7 @@
             "numero": "1224432156788765",
             "nome": "Elon Musk",
             "validade": "01/22",
-            "codigo": "555",
+            "codigo": 555,
             "vencimento": "25"
         }
     },
@@ -105,7 +105,7 @@
             "numero": "7745903512990001",
             "nome": "carla guerra",
             "validade": "08/25",
-            "codigo": "343",
+            "codigo": 343,
             "vencimento": "09"
         }
     }
