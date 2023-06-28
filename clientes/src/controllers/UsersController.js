@@ -1,4 +1,4 @@
-import Users from '../models/Users.js';
+import Users from '../models/User.js';
 
 class UserController {
   static getAll = async (_req, res) => {
