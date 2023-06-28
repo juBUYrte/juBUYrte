@@ -79,7 +79,16 @@ const userSchema = new mongoose.Schema(
           message: 'The name cannot start with numbers.',
         },
       },
-      validade: { type: String, required: true },
+      validade: {
+        type: String,
+        required: true,
+        validate: {
+          validator(value) {
+            return /^d{4}\/\d{2}\/\d{2}$/.test(value);
+          },
+          message: 'Data format is wrong',
+        },
+      },
       codigo: { type: Number, required: true },
       vencimento: { type: String, required: true },
     },

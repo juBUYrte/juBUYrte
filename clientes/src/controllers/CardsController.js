@@ -1,6 +1,6 @@
 import Users from '../models/User.js';
 
-const validaCard = async (dadosUser, dadosBody) => {
+const validaCard = (dadosUser, dadosBody) => {
   const objetosKeys1 = Object.keys(dadosUser);
   const objetosKeys2 = Object.keys(dadosBody);
   const objetosValues1 = Object.values(dadosUser);
@@ -33,16 +33,28 @@ class CardController {
     try {
       const dadosDoCartao = req.body;
       const users = await Users.find();
-      const userId = users.filter((async (user) => {
-        if (await validaCard(user.dadosDoCartao, dadosDoCartao)) {
+      const userFiltered = users.filter(((user) => {
+        if (validaCard(user.dadosDoCartao, dadosDoCartao)) {
           return user;
         }
       }));
-      if (userId.length === 0) {
-        res.status(400).json({ message: 'Invalid Card' });
+
+      if (userFiltered.length === 0) {
+        return res.status(400).json({ message: 'Invalid Card' });
+      }
+      const data = userFiltered[0].dadosDoCartao.validade;
+      const dataBody = data.split('/').reverse();
+      const year = Number(dataBody[0]) + 2000;
+      const month = dataBody[1];
+
+      const dateCard = new Date(`${year}/${month}`);
+      const nowDate = new Date();
+
+      if (dateCard < nowDate) {
+        return res.status(400).json({ message: 'Expired  Card' });
       }
 
-      res.status(200).json({ id: userId[0]._id });
+      res.status(200).json({ id: userFiltered[0]._id });
     } catch (err) {
       res.status(500).json(err);
     }
