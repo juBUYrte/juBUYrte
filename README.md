@@ -1,10 +1,10 @@
 # juBUYrte
-Olá! Esse é o nosso repositório do projeto final Alura NxtDev3. Nesse ReadMe você encontrará instruções para inicializar o ambiente de desenvolvimento, assim como detalhes do que o projeto soluciona. Qualquer dúvida entre em contato com a equipe Jubarte que ficaremos felizes em responder.
+Olá! Esse é o nosso repositório do projeto final Alura NxtDev3. Nesse ReadMe você encontrará instruções para inicializar o ambiente de desenvolvimento, assim como detalhes do que o projeto soluciona. Qualquer dúvida entre em contato com a equipe **Jubarte** 🐳 que ficaremos felizes em responder.
 
 
 ### Orientações
 <details>
-  <summary><strong>✨ Inicializando o ambiente </strong></summary><br />
+  <summary><strong>✨ Inicializando o Ambiente </strong></summary><br />
 
 Para inicializar o container, escreva o seguinte comando em seu terminal: `docker-compose up`. Entre na pasta que você deseja desenvolver e instale as depêndencias com `npm install`. Para que o projeto inicie basta utilizar o comando `npm start` e para que o ambiente seja atualizado a cada mudança no código, basta utilizar `npm run dev`.
 </details>
