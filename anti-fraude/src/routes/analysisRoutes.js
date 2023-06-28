@@ -5,6 +5,7 @@ import authTokenMiddleware from '../middlewares/authTokenMiddleware.js';
 const router = express.Router();
 
 router
-  .post('/api/admin/analysis', authTokenMiddleware, AnalysisController.createAnalysis);
+  .post('/api/admin/analysis', authTokenMiddleware, AnalysisController.createAnalysis)
+  .get('/api/admin/analysis', authTokenMiddleware, AnalysisController.findUnderReviewAnalysis);
 
 export default router;
