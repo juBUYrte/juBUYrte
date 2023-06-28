@@ -1,6 +1,19 @@
+/* eslint-disable no-underscore-dangle */
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import Account from '../models/Account.js';
 
 class AccountController {
+  static _criarToken = (id) => {
+    const payload = { id };
+    const secretKey = process.env.SECRET_KEY;
+    const expiration = process.env.EXPIRES_IN;
+    console.log(secretKey, expiration);
+    const token = jwt.sign(payload, secretKey, { expiresIn: expiration });
+
+    return token;
+  };
+
   static findAccounts = (_req, res) => {
     Account.find((err, allAccounts) => {
       if (err) {
@@ -24,16 +37,41 @@ class AccountController {
   };
 
   static createAccount = async (req, res) => {
+    const salt = 12;
+    const passwordHash = await bcrypt.hashSync(req.body.senha, salt);
+
     const account = new Account({
       ...req.body,
+      senha: passwordHash,
       createdDate: Date(),
     });
+
     account.save((err, newAccount) => {
       if (err) {
         return res.status(500).send({ message: err.message });
       }
       return res.status(201).set('Location', `/admin/accounts/${account.id}`).json(newAccount);
     });
+  };
+
+  static login = async (req, res) => {
+    const { email, senha } = req.body;
+
+    const usuario = await Account.findOne({ email });
+
+    if (!usuario) {
+      return res.status(401).send('Forneça email e senha válidos. Refaça a operação.');
+    }
+
+    const senhaValida = await bcrypt.compareSync(senha, usuario.senha);
+
+    if (!senhaValida) {
+      return res.status(401).send('Forneça email e senha válidos. Refaça a operação.');
+    }
+
+    const token = this._criarToken(usuario.id);
+
+    return res.status(200).send({ token });
   };
 
   static updateAccount = (req, res) => {
