@@ -1,0 +1,112 @@
+[
+    {
+        "nome": "Ana Carolina Lima",
+        "cpf": "12345678910",
+        "email": "carolina@gmail.com",
+        "telefone": "8399999999",
+        "rendaMensal": "4800",
+        "endereço": {
+            "rua": "casa do Ó",
+            "numero": "b12",
+            "complemento": "casa",
+            "cep": "21371450",
+            "cidade": "Rio de Janeiro",
+            "estado": "RJ"
+        },
+        "dadosDoCartao": {
+            "numero": "1234432156788765",
+            "nome": "Ana C Lima",
+            "validade": "12/30",
+            "codigo": "789",
+            "vencimento": "12"
+        }
+    },
+    {
+        "nome": "Paula Maria Bittencourt",
+        "cpf": "09832163718",
+        "email": "paula@mail.com",
+        "telefone": "83912358765",
+        "rendaMensal": "1000",
+        "endereço": {
+            "rua": "rua da P",
+            "numero": "12Fundo",
+            "complemento": "casa",
+            "cep": "2137941",
+            "cidade": "Rio de Janeiro",
+            "estado": "RJ"
+        },
+        "dadosDoCartao": {
+            "numero": "5479122156658754",
+            "nome": "Paula M Bittencourt",
+            "validade": "02/31",
+            "codigo": "942",
+            "vencimento": "06"
+        }
+    },   
+    {
+        "nome": "Ada Lovelace",
+        "cpf": "12345677910",
+        "email": "adalovelace@gmail.com",
+        "telefone": "8399959999",
+        "rendaMensal": "14800",
+        "endereço": {
+            "rua": "Rua das Amendoeiras",
+            "numero": "10",
+            "complemento": "Casa",
+            "cep": "21331450",
+            "cidade": "Recife",
+            "estado": "PE"
+        },
+        "dadosDoCartao": {
+            "numero": "1234432156788745",
+            "nome": "Ada Lovelace",
+            "validade": "12/27",
+            "codigo": "266",
+            "vencimento": "18"
+        }
+    },
+    {
+        "nome": "Elon Musk",
+        "cpf": "12445678910",
+        "email": "elonmusk@gmail.com",
+        "telefone": "8399799999",
+        "rendaMensal": "100800",
+        "endereço": {
+            "rua": "Rua dos Bobos",
+            "numero": "123",
+            "complemento": "Bl 2, Apartamento 201",
+            "cep": "21371450",
+            "cidade": "Manaus",
+            "estado": "AM"
+        },
+        "dadosDoCartao": {
+            "numero": "1224432156788765",
+            "nome": "Elon Musk",
+            "validade": "01/22",
+            "codigo": "555",
+            "vencimento": "25"
+        }
+    },
+    {
+        "nome": "Carla Guerra",
+        "cpf": "22732004691",
+        "email": "carla@mail.com",
+        "telefone": "84991345590",
+        "rendaMensal": "100000",
+        "endereço": {
+            "rua": "Avenida Magalhães",
+            "numero": "1201",
+            "complemento": "Apartamento 1501",
+            "cep": "59094399",
+            "cidade": "Rio Grande do Norte",
+            "estado": "RN"
+        },
+        "dadosDoCartao": {
+            "numero": "7745903512990001",
+            "nome": "carla guerra",
+            "validade": "08/25",
+            "codigo": "343",
+            "vencimento": "09"
+        }
+    }
+]
