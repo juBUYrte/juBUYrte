@@ -4,7 +4,7 @@ import bearerMiddlaware from '../middlewares/ensureBearerMiddleware.js';
 
 const router = express.Router();
 
-router
+const accounts = router
   .post('/api/accounts/login', AccountController.loginAccount)
   .get('/api/admin/accounts', bearerMiddlaware, AccountController.findAccounts)
   .get('/api/admin/accounts/:id', AccountController.findAccountById)
@@ -12,4 +12,4 @@ router
   .put('/api/admin/accounts/:id', AccountController.updateAccount)
   .delete('/api/admin/accounts/:id', AccountController.deleteAccount);
 
-export default router;
+export default accounts;
