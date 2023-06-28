@@ -4,11 +4,10 @@ import jwt from 'jsonwebtoken';
 import Account from '../models/Account.js';
 
 class AccountController {
-  static _criarToken = (id) => {
+  static _createToken = (id) => {
     const payload = { id };
     const secretKey = process.env.SECRET_KEY;
     const expiration = process.env.EXPIRES_IN;
-    console.log(secretKey, expiration);
     const token = jwt.sign(payload, secretKey, { expiresIn: expiration });
 
     return token;
@@ -57,19 +56,19 @@ class AccountController {
   static login = async (req, res) => {
     const { email, senha } = req.body;
 
-    const usuario = await Account.findOne({ email });
+    const user = await Account.findOne({ email });
 
-    if (!usuario) {
+    if (!user) {
       return res.status(401).send('Forneça email e senha válidos. Refaça a operação.');
     }
 
-    const senhaValida = await bcrypt.compareSync(senha, usuario.senha);
+    const validPassword = await bcrypt.compareSync(senha, user.senha);
 
-    if (!senhaValida) {
+    if (!validPassword) {
       return res.status(401).send('Forneça email e senha válidos. Refaça a operação.');
     }
 
-    const token = this._criarToken(usuario.id);
+    const token = this._createToken(user.id);
 
     return res.status(200).send({ token });
   };
