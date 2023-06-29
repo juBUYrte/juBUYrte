@@ -68,9 +68,15 @@ class CardController {
     try {
       const { id } = req.params;
       const resp = await Users.findById(id);
-      res.status(200).json({ rent: resp.rendaMensal });
+      if (!resp) {
+        return res.status(400).json({ message: 'Not found' });
+      }
+      return res.status(200).json({ rent: resp.rendaMensal });
     } catch (err) {
-      res.status(500).json(err);
+      if (err.name === 'CastError') {
+        return res.status(400).json({ message: 'Not found' });
+      }
+      return res.status(500).json(err);
     }
   };
 }
