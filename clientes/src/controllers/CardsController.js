@@ -1,28 +1,29 @@
 import Users from '../models/User.js';
 
 const validaCard = (dadosUser, dadosBody) => {
-  const objetosKeys1 = Object.keys(dadosUser);
-  const objetosKeys2 = Object.keys(dadosBody);
-  const objetosValues1 = Object.values(dadosUser);
-  const objetosValues2 = Object.values(dadosBody);
+  const {
+    numero, nome, validade, codigo,
+  } = dadosUser;
 
-  const resulQntKeys = [];
-  objetosKeys1.forEach(((key) => {
-    if (objetosKeys2.includes(key)) {
-      resulQntKeys.push(key);
-    }
-  }));
+  const newObject = {
+    numero,
+    nome,
+    validade,
+    codigo,
+  };
+  const keysUser = Object.keys(newObject);
+  const valuesUser = Object.values(newObject);
 
-  const resulQntValues = [];
-  objetosValues1.forEach(((value) => {
-    if (objetosValues2.includes(value)) {
-      resulQntValues.push(value);
-    }
-  }));
-  const we = resulQntKeys.length === 4;
-  const re = resulQntValues.length === 4;
+  const keysBody = Object.keys(dadosBody);
+  const valuesBody = Object.values(dadosBody);
+  const ensureKeys = keysUser.every(((key) => keysBody.includes(key)));
+  const ensureValues = valuesUser.every(((value) => valuesBody.includes(value)));
 
-  if (we && re) {
+  if (!ensureKeys) {
+    throw new Error('Required keys : numero , nome , validade , codigo ');
+  }
+
+  if (ensureKeys && ensureValues) {
     return true;
   }
   return false;
@@ -54,9 +55,12 @@ class CardController {
         return res.status(400).json({ message: 'Expired  Card' });
       }
 
-      res.status(200).json({ id: userFiltered[0]._id });
+      return res.status(200).json({ id: userFiltered[0]._id });
     } catch (err) {
-      res.status(500).json(err);
+      if (err.message === 'Required keys : numero , nome , validade , codigo ') {
+        return res.status(409).json({ message: err.message });
+      }
+      return res.status(500).json(err);
     }
   };
 
