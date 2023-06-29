@@ -45,6 +45,9 @@ class AccountController {
 
   static createAccount = async (req, res) => {
     const { nome, email, senha } = req.body;
+    if (!nome || !email || !senha) {
+      return res.status(409).json({ message: 'Required "nome" , "email" , "senha".' });
+    }
     const userEmail = await Account.findOne({ email });
     if (userEmail) {
       return res.status(409).json({ message: 'Email already exists' });
@@ -62,7 +65,7 @@ class AccountController {
 
     try {
       await account.save();
-      return res.status(201).set('Location', `/admin/accounts/${account.id}`).json(account);
+      return res.status(201).json(account);
     } catch (error) {
       return res.status(500).send({ message: error.message });
     }
@@ -80,10 +83,13 @@ class AccountController {
     }
 
     Account.findByIdAndUpdate(id, { $set: req.body }, { new: true }, (err, account) => {
+      if (!account) {
+        return res.status(404).send({ message: 'Not found' });
+      }
       if (err) {
         return res.status(500).send({ message: err.message });
       }
-      return res.status(204).set('Location', `/admin/accounts/${account.id}`).send();
+      return res.status(204).send();
     });
     return '';
   };

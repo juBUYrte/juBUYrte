@@ -4,7 +4,7 @@ import {
 } from '@jest/globals';
 import app from '../../src/app.js';
 
-describe('Testes da rota de login', () => {
+describe('Testes da rota de POST /accounts/login', () => {
   let connection;
 
   beforeAll(() => {
@@ -16,7 +16,7 @@ describe('Testes da rota de login', () => {
   });
   it('A rota deve retornar um status 204 ao passar dados validos', async () => {
     const object = {
-      email: 'isa99@mail.com',
+      email: 'usuario3@mail.com',
       senha: '1234',
     };
     await request(app)
@@ -26,7 +26,7 @@ describe('Testes da rota de login', () => {
   });
   it('A rota deve retornar um status 400 ao passar dados invalidos', async () => {
     const object = {
-      email: 'isa99@mail.com',
+      email: 'usuario3@mail.com',
       senha: '12345',
     };
     await request(app)
@@ -36,7 +36,7 @@ describe('Testes da rota de login', () => {
   });
   it('A rota deve retornar um token', async () => {
     const object = {
-      email: 'isa99@mail.com',
+      email: 'usuario3@mail.com',
       senha: '1234',
     };
     const req = await request(app)
