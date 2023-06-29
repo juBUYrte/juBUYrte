@@ -2,6 +2,7 @@
 import NotFoundError from '../errors/NotFoundError.js';
 import UnauthorizedError from '../errors/UnauthorizedError.js';
 import Analysis from '../models/Analysis.js';
+import fetchClient from '../util/fetchClients.js';
 
 class AnalysisController {
   static _verifyAnalysis = async (id) => {
@@ -20,7 +21,13 @@ class AnalysisController {
       createdDate: Date(),
     });
 
-    analysis.save((err, newAnalysis) => {
+    try {
+      await fetchClient(analysis.clientId);
+    } catch (err) {
+      return res.status(500).send({ message: 'ClientID não encontrada nos serviços de clients' });
+    }
+
+    await analysis.save((err, newAnalysis) => {
       if (err) {
         return res.status(500).send({ message: err.message });
       }
@@ -51,6 +58,23 @@ class AnalysisController {
         return res.status(422).send({ message: 'O id informado é inválido, favor informe um id compatível com o tipo ObjectID' });
       }
       return res.status(error.status || 500).send({ message: error.message });
+    }
+  };
+  
+  static findWithDetailsById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const analysis = await Analysis.findById(id);
+
+      if (!analysis) {
+        return res.status(404).json();
+      }
+
+      const dadosUsuario = await fetchClient(analysis.clientId);
+      return res.status(200).json({ analysis, dadosUsuario });
+    } catch (error) {
+      return res.status(500).send({ message: error.message });
     }
   };
 }
