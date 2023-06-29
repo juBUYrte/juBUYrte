@@ -38,6 +38,8 @@ Também é possível **buscar todos os usuários, buscar usuários por ID espec�
 
 Nos asseguramos de garantir dados válidos e confiáveis dos cartões de crédito nas contas de nossos usuários. Nosso projeto faz a **validação dos dados** e da **renda** que o usuário possui, facilitando os microsserviços de Transações e Antifraude.
 
+<br>
+
 ## Transações
 
 ## AntiFraude
