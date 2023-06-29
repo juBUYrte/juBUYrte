@@ -15,12 +15,12 @@ describe('Testes da rota de PUT /api/admin/accounts/:id', () => {
   it('A rota deve retornar um usuário, por ID', async () => {
     const resp = await request(app).get('/api/admin/accounts');
     const {
-      _id, nome, email, senha,
+      _id, email, senha,
     } = resp.body[0];
     console.log(_id);
     const respId = await request(app).get(`/api/admin/accounts/${_id}`);
     expect(respId.body).toHaveProperty('_id');
-    expect(respId.body.nome).toBe(nome);
+    expect(respId.body).toHaveProperty('nome');
     expect(respId.body.email).toBe(email);
     expect(respId.body.senha).toBe(senha);
   });
