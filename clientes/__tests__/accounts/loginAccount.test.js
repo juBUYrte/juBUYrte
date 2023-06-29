@@ -1,6 +1,6 @@
 import request from 'supertest';
 import {
-  beforeAll, afterAll, describe, expect, it, jest,
+  beforeAll, afterAll, describe, expect, it,
 } from '@jest/globals';
 import app from '../../src/app.js';
 
@@ -45,16 +45,8 @@ describe('Testes da rota de login', () => {
       .expect(204);
 
     const bearer = req.header.authorization.split(' ')[0];
-    console.log(bearer);
-
-    console.log(typeof req.header.authorization);
+    const token = req.header.authorization.split(' ')[1];
+    expect(bearer).toBe('Bearer');
+    expect(typeof token).toBe('string');
   });
-
-//   it('O POST deve conseguir fazer o login de admin.', async () => {
-//     await request(app)
-//       .get('/api/admin/accounts/login')
-//       .set('Accept', 'application/json')
-//       .expect('content-type', /json/)
-//       .expect(200);
-//   });
 });

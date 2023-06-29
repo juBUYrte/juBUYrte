@@ -7,13 +7,13 @@ import app from '../../src/app.js';
 describe('Testes da criação de contas', () => {
   let connection;
 
-  beforeAll(() => {
-    const PORT = 9999;
-    connection = app.listen(PORT);
-  });
-  afterAll(() => {
-    connection.close();
-  });
+  //   beforeAll(() => {
+  //     const PORT = 9999;
+  //     connection = app.listen(PORT);
+  //   });
+  //   afterAll(() => {
+  //     connection.close();
+  //   });
 
   it('IAAAAAAAAA', async () => {
     const object = {
