@@ -29,5 +29,14 @@ Os testes desse projeto foram feitos utilizando o [JEST](https://jestjs.io/pt-BR
 
 <br><br>
 
+## Clientes
+
+## Transações
+
+## AntiFraude
+
+## Testes
+
+<br><br>
 ### Créditos
 <em>Feito com carinho por Alison, Taynara, Vitor, Lauro, Ana Carolina, Filipe e Samuel.</em>
