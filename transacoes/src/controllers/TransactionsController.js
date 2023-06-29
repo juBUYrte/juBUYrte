@@ -3,6 +3,15 @@ import fetch from 'node-fetch';
 import Transaction from '../models/Transaction.js';
 
 class TransactionsController {
+  static getAllTransactions = (_, res) => {
+    Transaction.find((err, transactions) => {
+      if (err) {
+        return res.status(500).send({ message: err.message });
+      }
+      return res.status(200).json(transactions);
+    });
+  }
+
   static createTransaction = async (req, res) => {
     const { valor, dadosDoCartao } = req.body;
 
@@ -16,12 +25,18 @@ class TransactionsController {
         }
       );
       const responseCartao = await dataCartao.json();
+      if (responseCartao.message) {
+        return res.status(dataCartao.status).json(responseCartao)
+      }
       const idUser = responseCartao.id;
 
       const dataRent = await fetch(
         `http://localhost:3001/api/admin/users/cards/${idUser}`
       );
       const responseRent = await dataRent.json();
+      if (responseRent.message) {
+        return res.status(dataRent.status).json(responseRent)
+      }
       const rent = responseRent.rent;
 
       let status = '';
@@ -42,38 +57,46 @@ class TransactionsController {
 
       return res.status(201).json({ _id: response._id, status });
     } catch (error) {
-      return res.status(500).json(error);
+      return res.status(500).json({ message: error.message });
     }
   };
 
-  static getTransactionById = async (req, res) => {
+  static getTransactionById = (req, res) => {
     const { id } = req.params;
 
-    try {
-      const response = await Transaction.findById(id);
-      return res.status(200).json(response);
-    } catch (error) {
-      return res.status(404).json({ message: 'ID not found' });
-    }
+    Transaction.findById(id, (err, transaction) => {
+      if (err) {
+        return res.status(500).send({ message: err.message });
+      }
+      if (!transaction) {
+        return res.status(404).json({ message: 'ID not found' });
+      }
+      return res.status(200).json(transaction);
+    });
   };
 
   static updateStatusById = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    try {
-      const transaction = await Transaction.findById(id);
-
+    Transaction.findById(id, (err, transaction) => {
+      if (err) {
+        return res.status(500).send({ message: err.message });
+      }
+      if (!transaction) {
+        return res.status(404).json({ message: 'ID not found' });
+      }
       if (transaction.status === 'Rejeitada' || transaction.status === 'Aprovada') {
-        return res.status(401).send({ message: 'Not allowed' });
+        return res.status(405).send({ message: 'Not allowed' });
       }
 
-      await Transaction.findByIdAndUpdate(id, { $set: { status } });
-
-      return res.sendStatus(200);
-    } catch (error) {
-      return res.status(500).json(error);
-    }
+      Transaction.findByIdAndUpdate(id, { $set: { status } }, (err, _) => {
+        if (err) {
+          return res.status(500).send({ message: err.message });
+        }
+        return res.sendStatus(200);
+      });
+    });
   }
 }
 
