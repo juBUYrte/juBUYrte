@@ -30,6 +30,13 @@ Os testes desse projeto foram feitos utilizando o [JEST](https://jestjs.io/pt-BR
 <br><br>
 
 ## Clientes
+É necessário **criar um usuário** para interagir com as possibilidades do nosso projeto. Tendo um usuário é possível **criar uma conta** onde não há necessidade de se preocupar com a segurança da senha pois utilizamos a biblioteca `bcrypt` para garantir a criptografia desse dado sensível. Ao fazer login o usuário tem os privilégios de **buscar contas, buscar contas por ID específico, atualizar contas e deletar contas**. 
+
+Esses privilégios só duram enquanto o usuário possuir um token de autenticação ativo, que foi implementado com a lib `passport`.
+
+Também é possível **buscar todos os usuários, buscar usuários por ID específico e deletar usuários**.
+
+Nos asseguramos de garantir dados válidos e confiáveis dos cartões de crédito nas contas de nossos usuários. Nosso projeto faz a **validação dos dados** e da **renda** que o usuário possui, facilitando os microsserviços de Transações e Antifraude.
 
 ## Transações
 
