@@ -25,12 +25,18 @@ class TransactionsController {
         }
       );
       const responseCartao = await dataCartao.json();
+      if (responseCartao.message) {
+        return res.status(dataCartao.status).json(responseCartao)
+      }
       const idUser = responseCartao.id;
 
       const dataRent = await fetch(
         `http://localhost:3001/api/admin/users/cards/${idUser}`
       );
       const responseRent = await dataRent.json();
+      if (responseRent.message) {
+        return res.status(dataRent.status).json(responseRent)
+      }
       const rent = responseRent.rent;
 
       let status = '';
