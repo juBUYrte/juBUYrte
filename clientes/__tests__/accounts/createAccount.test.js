@@ -9,7 +9,7 @@ const tokenAcess = await createTokenClient();
 
 describe('Testes da rota de POST /api/admin/accounts', () => {
   it('Deve criar um Account', async () => {
-    const accountRetorn = {
+    const accountReturn = {
       _id: expect.any(String),
       nome: 'usuario criado TESTE',
       email: 'CRIANDO51@mail.com',
@@ -21,8 +21,8 @@ describe('Testes da rota de POST /api/admin/accounts', () => {
       senha: '1234',
     }).expect(201);
 
-    expect(resp.body.nome).toBe(accountRetorn.nome);
-    expect(resp.body.email).toBe(accountRetorn.email);
+    expect(resp.body.nome).toBe(accountReturn.nome);
+    expect(resp.body.email).toBe(accountReturn.email);
     expect(typeof resp.body.senha).toBe('string');
     expect(typeof resp.body._id).toBe('string');
 
@@ -41,7 +41,7 @@ describe('Testes da rota de POST /api/admin/accounts', () => {
     expect(resp.status).toBe(409);
     expect(resp.body).toHaveProperty('message');
   });
-  it('Deve retornar um erro 500, quando o body é inválido', async () => {
+  it('Deve retornar um erro 409, quando o body é inválido', async () => {
     const invalidAccount = {};
     const resp = await request(app).post('/api/admin/accounts').send(invalidAccount);
     expect(resp.status).toBe(409);

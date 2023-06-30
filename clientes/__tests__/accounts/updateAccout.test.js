@@ -34,7 +34,7 @@ describe('Testes da rota de PUT /api/admin/accounts/:id', () => {
     expect(atualizandoObjeto.statusCode).toBe(204);
   });
   it('A rota deve retornar um status 404 para um ID invalido', async () => {
-    const id = '649aec324afa781f3c5a7759';
+    const id = '649c3d4f67d28be127782a60';
     await request(app)
       .put(`/api/admin/accounts/${id}`)
       .set({ Authorization: `Bearer ${tokenAcess}` })
@@ -42,7 +42,7 @@ describe('Testes da rota de PUT /api/admin/accounts/:id', () => {
   });
   it('A rota deve retornar um status 401 ao não passar token de acesso', async () => {
     await request(app)
-      .put('/api/admin/accounts/87262876238748235')
+      .put('/api/admin/accounts/649c3d4f67d28be127782a60')
       .expect(401);
   });
 });

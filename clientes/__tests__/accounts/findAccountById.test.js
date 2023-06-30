@@ -7,7 +7,7 @@ import createTokenClient from '../../solutions/token.js';
 
 const tokenAcess = await createTokenClient();
 
-describe('Testes da rota de PUT /api/admin/accounts/:id', () => {
+describe('Testes da rota de GET /api/admin/accounts/:id', () => {
   it('A rota deve retornar um status 200', async () => {
     const resp = await request(app).get('/api/admin/accounts')
       .set({ Authorization: `Bearer ${tokenAcess}` });
@@ -34,9 +34,15 @@ describe('Testes da rota de PUT /api/admin/accounts/:id', () => {
     expect(respId.body.email).toBe(email);
     expect(respId.body.senha).toBe(senha);
   });
-  it('A rota deve retornar um status 401 ao não passar token de acesso', async () => {
+  it('A rota deve retornar um status 404 ao não passar Id invalido', async () => {
     await request(app)
-      .get('/api/admin/accounts/1231255878617263')
+      .get('/api/admin/accounts/649c3d4f67d28be127782a60')
+      .set({ Authorization: `Bearer ${tokenAcess}` })
+      .expect(404);
+  });
+  it('A rota deve retornar um status 401 ao  passar token de acesso', async () => {
+    await request(app)
+      .get('/api/admin/accounts/649c3d4f67d28be127782a60')
       .expect(401);
   });
 });
