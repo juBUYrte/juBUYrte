@@ -82,12 +82,6 @@ const userSchema = new mongoose.Schema(
       validade: {
         type: String,
         required: true,
-        validate: {
-          validator(value) {
-            return /^\d{4}\/\d{2}\/\d{2}$/.test(value);
-          },
-          message: 'Data format is wrong',
-        },
       },
       codigo: { type: String, required: true },
       vencimento: { type: String, required: true },
