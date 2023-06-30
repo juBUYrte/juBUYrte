@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 
-mongoose.connect(`mongodb://admin:secret@${process.env.MONGO_HOST || '127.0.0.1'}:27017/anti-fraude?authSource=admin`);
+const database = process.env.NODE_ENV === 'test' ? 'anti-fraude-test' : 'anti-fraude';
+console.log(database);
+mongoose.connect(`mongodb://admin:secret@${process.env.MONGO_HOST || '127.0.0.1'}:27017/${database}?authSource=admin`);
 
 const db = mongoose.connection;
 
