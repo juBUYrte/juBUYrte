@@ -36,6 +36,11 @@ class AccountController {
   };
 
   static createAccount = async (req, res) => {
+    const hasEmail = await Account.findOne({ email: req.body.email });
+    if (hasEmail) {
+      return res.status(409).send({ message: 'Email already exists' });
+    }
+
     const salt = 12;
     const passwordHash = await bcrypt.hashSync(req.body.senha, salt);
 
@@ -45,12 +50,12 @@ class AccountController {
       createdDate: Date(),
     });
 
-    account.save((err, newAccount) => {
-      if (err) {
-        return res.status(500).send({ message: err.message });
-      }
-      return res.status(201).set('Location', `/admin/accounts/${account.id}`).json(newAccount);
-    });
+    try {
+      await account.save();
+      return res.status(201).set('Location', `/admin/accounts/${account.id}`).send(account);
+    } catch (error) {
+      return res.status(500).send({ message: error.message });
+    }
   };
 
   static login = async (req, res) => {
@@ -70,7 +75,7 @@ class AccountController {
 
     const token = this._createToken(user.id);
 
-    return res.status(200).send({ token });
+    return res.status(204).header('Authorization', `Bearer ${token}`).send();
   };
 
   static updateAccount = (req, res) => {
