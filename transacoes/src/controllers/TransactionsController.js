@@ -3,6 +3,10 @@ import Transaction from '../models/Transaction.js';
 import createToken from '../../solutions/token.js';
 import { createAnalysis, getClientId, getClientRent } from '../services/TransactionsServices.js';
 
+const HOSTNAME = process.env.TRANSACOES_HOSTNAME || 'localhost';
+const PORT = process.env.TRANSACOES_PORT || '3002';
+const URL = `http://${HOSTNAME}:${PORT}/api/admin`;
+
 class TransactionsController {
   static getAllTransactions = (_, res) => {
     Transaction.find((err, transactions) => {
@@ -69,7 +73,34 @@ class TransactionsController {
       if (!transaction) {
         return res.status(404).json({ message: 'ID not found' });
       }
-      return res.status(200).json(transaction);
+      let responseBody = {
+        _id: transaction._id,
+        valor: transaction._id,
+        idUser: transaction.idUser,
+        status: transaction.status,
+      };
+
+      if (transaction.status === 'Em análise') {
+        responseBody._links = {
+          "self": {
+            method: 'GET',
+            href: `${URL}/transactions/${transaction._id}`,
+          },
+          "Aprovar": {
+            method: 'PATCH',
+            obs: 'O método deve ser chamado pela API anti-fraude',
+            href: `${URL}/transactions/${transaction._id}`,
+            body: { status: 'Aprovada' }
+          },
+          "Rejeitar": {
+            method: 'PATCH',
+            obs: 'O método deve ser chamado pela API anti-fraude',
+            href: `${URL}/transactions/${transaction._id}`,
+            body: { status: 'Rejeitada' }
+          }
+        };
+      }
+      return res.status(200).json(responseBody);
     });
   };
 
