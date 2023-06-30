@@ -8,7 +8,7 @@ import goToken from '../authentication/auth.js';
 dotenv.config();
 class AccountController {
   static loginAccount = async (req, res, next) => {
-    passport.authenticate('local', { session: false }, (err, user, info) => {
+    passport.authenticate('local', { session: false }, (err, user, _) => {
       if (err) {
         return next(err);
       }
@@ -59,6 +59,32 @@ class AccountController {
       senha: hashSenha,
       createdDate: Date(),
     });
+
+    await fetch(
+      'http://localhost:3000/api/admin/accounts',
+      {
+        method: 'post',
+        body: JSON.stringify({
+          nome,
+          email,
+          senha: hashSenha,
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+
+    await fetch(
+      'http://localhost:3001/api/admin/accounts',
+      {
+        method: 'post',
+        body: JSON.stringify({
+          nome,
+          email,
+          senha: hashSenha,
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
 
     try {
       await account.save();
