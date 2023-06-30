@@ -45,3 +45,4 @@ services:
 
 volumes:
   vol-mongo-anti-fraude:
+  

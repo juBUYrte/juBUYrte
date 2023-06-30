@@ -10,7 +10,7 @@
         "lint": "eslint ./src/**/*.js",
         "lint:fix": "eslint ./src/**/*.js --fix",
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose",
-        "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --watch"
+        "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --watchAll --coverage"
     },
     "author": "",
     "license": "MIT",
