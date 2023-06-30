@@ -6,6 +6,9 @@ const router = express.Router();
 
 router
   .post('/api/admin/analysis', authTokenMiddleware, AnalysisController.createAnalysis)
-  .get('/api/admin/analysis', authTokenMiddleware, AnalysisController.findUnderReviewAnalysis);
+  .get('/api/admin/analysis', authTokenMiddleware, AnalysisController.findUnderReviewAnalysis)
+  .get('/api/admin/analysis/:id', AnalysisController.findWithDetailsById)
+  .delete('/api/admin/analysis/:id', authTokenMiddleware, AnalysisController.deleteAnalysis)
+  .patch('/api/admin/analysis/:id', AnalysisController.updateAnalysisAndTransaction);
 
 export default router;

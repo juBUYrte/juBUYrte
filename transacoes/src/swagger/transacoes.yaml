@@ -1,12 +1,37 @@
 openapi: 3.0.3
 info:
-  title: Clientes API
+  title: API Transações
   description: |-
-    API do microsserviço de Clientes
+    API do microsserviço de Transações
   version: 0.0.1
+tags:
+  - name: accounts
+  - name: transactions
+servers:
+  - url: http://localhost:3002
+
 paths:
+  /api/accounts/login:
+    post:
+      tags:
+        - accounts
+      summary: Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '204':
+          description: Logged successfully.
+        '404':
+          description: User not found.
   /api/admin/accounts:
     get:
+      security:
+        - auth: []
+      tags:
+        - accounts
       summary: List accounts
       description: List all accounts
       responses:
@@ -17,26 +42,38 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Account"
+                  $ref: '#/components/schemas/Account'
+        '500':
+          description: Internal Server Error.
+        '401':
+          description: Unauthorized
     post:
+      tags:
+        - accounts
       summary: Add account
       description: Add new account
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Account"
+              $ref: '#/components/schemas/Account'
       responses:
         '201':
           description: created
           content:
             application/json:
               schema:
-                  $ref: "#/components/schemas/Account"
-        '401':
-          description: unauthorized
+                $ref: '#/components/schemas/Account'
+        '409':
+          description: Email already exists
+        '500':
+          description: Internal Server Error
   /api/admin/accounts/{id}:
     get:
+      security:
+        - auth: []
+      tags:
+        - accounts
       summary: Find account
       description: Find one specific account
       parameters:
@@ -52,56 +89,171 @@ paths:
           content:
             application/json:
               schema:
-                  $ref: "#/components/schemas/Account"
-        '400':
-          description: invalid ID supplied
+                $ref: '#/components/schemas/Account'
+        '401':
+          description: Unauthorized
         '404':
-          description: not found
+          description: User Not Found
+        '500':
+          description: Internal Server Error
     put:
+      security:
+        - auth: []
+      tags:
+        - accounts
       summary: Update account
       description: Update account by entering the whole updated account
       parameters:
-      - name: id
-        in: path
-        description: ID of account that needs to be updated
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: ID of account that needs to be updated
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
             schema:
-                $ref: "#/components/schemas/Account"
+              $ref: '#/components/schemas/Account'
       responses:
-        '200':
+        '204':
           description: ok
           content:
             application/json:
               schema:
-                  $ref: "#/components/schemas/Account"
-        '400':
-          description: invalid ID supplied
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: User not found
         '401':
-          description: unauthorized
+          description: Unauthorized
+        '409':
+          description: Email already exists
+        '500':
+          description: Internal Server Error
     delete:
+      security:
+        - auth: []
+      tags:
+        - accounts
       summary: Delete account
       description: Delete account by entering its ID
       parameters:
-      - name: id
-        in: path
-        description: ID of account that needs to be deleted
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: ID of account that needs to be deleted
+          required: true
+          schema:
+            type: string
       responses:
         '204':
           description: no content
+        '404':
+          description: User not found
         '401':
-          description: unauthorized
-        '400':
-          description: invalid ID supplied
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+  /api/admin/transactions:
+    post:
+      tags:
+        - transactions
+      description: create a new transaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTransaction'
+      responses:
+        '201':
+          description: Successfull operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '500':
+          description: Internal Server Error
+    get:
+      tags:
+        - transactions
+      description: get all transactions
+      responses:
+        '200':
+          description: Successfull operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '500':
+          description: Internal Server Error
+  /api/admin/transactions/{id}:
+    get:
+      tags:
+        - transactions
+      description: get a transaction by id
+      parameters:
+        - name: id
+          in: path
+          description: ID of transaction that needs to be fetched
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfull operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    patch:
+      tags:
+        - transactions
+      description: change status of a transaction
+      parameters:
+        - name: id
+          in: path
+          description: ID of transaction that needs to be fetched
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - 'Aprovada'
+                    - 'Rejeitada'
+      responses:
+        '204':
+          description: Success
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+        '405':
+          description: Not Allowed
+        '500':
+          description: Internal Server Error
+security:
+  - auth: []
 components:
   schemas:
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        senha:
+          type: string
+          format: password
     Account:
       type: object
       properties:
@@ -115,3 +267,40 @@ components:
         senha:
           type: string
           format: password
+    NewTransaction:
+      type: object
+      properties:
+        dadosDoCartao:
+          type: object
+          properties:
+            numero:
+              type: string
+            nome:
+              type: string
+            validade:
+              type: string
+            codigo:
+              type: number
+        valor:
+          type: number
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+        valor:
+          type: number
+        idUser:
+          type: string
+        status:
+          type: string
+          example: 'Em análise'
+          enum:
+            - 'Em análise'
+            - 'Aprovada'
+            - 'Reprovada'
+  securitySchemes:
+    auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

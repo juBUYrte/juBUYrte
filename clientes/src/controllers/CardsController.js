@@ -1,28 +1,29 @@
 import Users from '../models/User.js';
 
-const validaCard = async (dadosUser, dadosBody) => {
-  const objetosKeys1 = Object.keys(dadosUser);
-  const objetosKeys2 = Object.keys(dadosBody);
-  const objetosValues1 = Object.values(dadosUser);
-  const objetosValues2 = Object.values(dadosBody);
+const validaCard = (dadosUser, dadosBody) => {
+  const {
+    numero, nome, validade, codigo,
+  } = dadosUser;
 
-  const resulQntKeys = [];
-  objetosKeys1.forEach(((key) => {
-    if (objetosKeys2.includes(key)) {
-      resulQntKeys.push(key);
-    }
-  }));
+  const newObject = {
+    numero,
+    nome,
+    validade,
+    codigo,
+  };
+  const keysUser = Object.keys(newObject);
+  const valuesUser = Object.values(newObject);
 
-  const resulQntValues = [];
-  objetosValues1.forEach(((value) => {
-    if (objetosValues2.includes(value)) {
-      resulQntValues.push(value);
-    }
-  }));
-  const we = resulQntKeys.length === 4;
-  const re = resulQntValues.length === 4;
+  const keysBody = Object.keys(dadosBody);
+  const valuesBody = Object.values(dadosBody);
+  const ensureKeys = keysUser.every(((key) => keysBody.includes(key)));
+  const ensureValues = valuesUser.every(((value) => valuesBody.includes(value)));
 
-  if (we && re) {
+  if (!ensureKeys) {
+    throw new Error('Required keys : numero , nome , validade , codigo ');
+  }
+
+  if (ensureKeys && ensureValues) {
     return true;
   }
   return false;
@@ -33,18 +34,33 @@ class CardController {
     try {
       const dadosDoCartao = req.body;
       const users = await Users.find();
-      const userId = users.filter((async (user) => {
-        if (await validaCard(user.dadosDoCartao, dadosDoCartao)) {
+      const userFiltered = users.filter(((user) => {
+        if (validaCard(user.dadosDoCartao, dadosDoCartao)) {
           return user;
         }
       }));
-      if (userId.length === 0) {
-        res.status(400).json({ message: 'Invalid Card' });
+
+      if (userFiltered.length === 0) {
+        return res.status(400).json({ message: 'Invalid Card' });
+      }
+      const data = userFiltered[0].dadosDoCartao.validade;
+      const dataBody = data.split('/').reverse();
+      const year = Number(dataBody[0]) + 2000;
+      const month = dataBody[1];
+
+      const dateCard = new Date(`${year}/${month}`);
+      const nowDate = new Date();
+
+      if (dateCard < nowDate) {
+        return res.status(400).json({ message: 'Expired  Card' });
       }
 
-      res.status(200).json({ id: userId[0]._id });
+      return res.status(200).json({ id: userFiltered[0]._id });
     } catch (err) {
-      res.status(500).json(err);
+      if (err.message === 'Required keys : numero , nome , validade , codigo ') {
+        return res.status(409).json({ message: err.message });
+      }
+      return res.status(500).json(err);
     }
   };
 
@@ -52,9 +68,15 @@ class CardController {
     try {
       const { id } = req.params;
       const resp = await Users.findById(id);
-      res.status(200).json({ rent: resp.rendaMensal });
+      if (!resp) {
+        return res.status(400).json({ message: 'Not found' });
+      }
+      return res.status(200).json({ rent: resp.rendaMensal });
     } catch (err) {
-      res.status(500).json(err);
+      if (err.name === 'CastError') {
+        return res.status(400).json({ message: 'Not found' });
+      }
+      return res.status(500).json(err);
     }
   };
 }
