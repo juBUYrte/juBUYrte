@@ -89,7 +89,7 @@ const userSchema = new mongoose.Schema(
           message: 'Data format is wrong',
         },
       },
-      codigo: { type: Number, required: true },
+      codigo: { type: String, required: true },
       vencimento: { type: String, required: true },
     },
   },

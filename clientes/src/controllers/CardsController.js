@@ -39,7 +39,6 @@ class CardController {
           return user;
         }
       }));
-
       if (userFiltered.length === 0) {
         return res.status(400).json({ message: 'Invalid Card' });
       }
@@ -69,7 +68,7 @@ class CardController {
       const { id } = req.params;
       const resp = await Users.findById(id);
       if (!resp) {
-        return res.status(400).json({ message: 'Not found' });
+        return res.status(404).json({ message: 'Not found' });
       }
       return res.status(200).json({ rent: resp.rendaMensal });
     } catch (err) {

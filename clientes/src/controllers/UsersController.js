@@ -1,12 +1,18 @@
-import crypto from 'crypto';
 import Users from '../models/User.js';
-// const crypto = require('crypto');
-const DADOS_CRIPTOGRAFAR = {
-  algoritmo: 'aes256',
-  segredo: 'chaves',
-  tipo: 'hex',
+
+const cartaoTest = {
+  numero: '1234432156788765',
+  nome: 'carol fake',
+  validade: '12/30',
+  codigo: '789',
+  vencimento: '12',
 };
-const cipher = crypto.createCipheriv(DADOS_CRIPTOGRAFAR.algoritmo, DADOS_CRIPTOGRAFAR.segredo);
+
+const startCript = (dados) => {
+  const keysCart = Object.keys(dados);
+  const valuesCart = Object.values(dados);
+};
+startCript(cartaoTest);
 
 class UserController {
   static getAll = async (_req, res) => {
@@ -54,11 +60,4 @@ class UserController {
     }
   };
 }
-const criptogragia = (dado) => {
-  cipher.update(dado);
-  return cipher.final();
-};
-
-// console.log(criptogragia('ABOBORA'));
-
 export default UserController;
