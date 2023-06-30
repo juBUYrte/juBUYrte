@@ -2,6 +2,66 @@ import fetch from 'node-fetch';
 
 import Transaction from '../models/Transaction.js';
 
+import createToken from '../../solutions/token.js';
+
+const createAnalysis = async (res, transaction) => {
+  const tokenAntiFraude = await createToken(3000);
+  const clientId = transaction.idUser;
+  const transactionId = transaction._id.toString();
+
+  const body = { clientId, transactionId };
+
+  const data = await fetch(
+    'http://localhost:3000/api/admin/analysis',
+    {
+      method: 'post',
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json', 'Authorization': tokenAntiFraude }
+    }
+  );
+  const responseAnalise = await data.json();
+
+  if (responseAnalise.message) {
+    return res.status(data.status).json(responseAnalise)
+  }
+
+  return 'OK';
+}
+
+const getClientId = async (res, dadosDoCartao, tokenClient) => {
+  const dataCartao = await fetch('http://localhost:3001/api/admin/users/cards', {
+    method: 'post',
+    body: JSON.stringify(dadosDoCartao),
+    headers: { 'Content-Type': 'application/json', 'Authorization': tokenClient }
+  });
+
+  const responseCartao = await dataCartao.json();
+
+  if (responseCartao.message) {
+    return res.status(dataCartao.status).json(responseCartao);
+  }
+
+  const idUser = responseCartao.id;
+  return idUser;
+}
+
+const getClientRent = async (res, idUser, tokenClient) => {
+  const dataRent = await fetch(`http://localhost:3001/api/admin/users/cards/${idUser}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': tokenClient
+    }
+  });
+
+  const responseRent = await dataRent.json();
+
+  if (responseRent.message) {
+    return res.status(dataRent.status).json(responseRent);
+  }
+
+  const rent = responseRent.rent;
+  return rent;
+}
 class TransactionsController {
   static getAllTransactions = (_, res) => {
     Transaction.find((err, transactions) => {
@@ -16,70 +76,35 @@ class TransactionsController {
     const { valor, dadosDoCartao } = req.body;
 
     try {
-      const dataCartao = await fetch(
-        'http://localhost:3001/api/admin/users/cards',
-        {
-          method: 'post',
-          body: JSON.stringify(dadosDoCartao),
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-      const responseCartao = await dataCartao.json();
-      if (responseCartao.message) {
-        return res.status(dataCartao.status).json(responseCartao)
+      const tokenClient = await createToken(3001);
+      if (typeof tokenClient !== 'string') {
+        return;
       }
-      const idUser = responseCartao.id;
 
-      const dataRent = await fetch(
-        `http://localhost:3001/api/admin/users/cards/${idUser}`
-      );
-      const responseRent = await dataRent.json();
-      if (responseRent.message) {
-        return res.status(dataRent.status).json(responseRent)
+      const idUser = await getClientId(res, dadosDoCartao, tokenClient);
+      if (typeof idUser !== 'string') {
+        return;
       }
-      const rent = responseRent.rent;
+
+      const rent = await getClientRent(res, idUser, tokenClient);
+      if (typeof rent !== 'number') {
+        return;
+      }
 
       let status = '';
+      valor >= rent * 0.5 ? status = 'Em análise' : status = 'Aprovada';
 
-      if (valor >= rent * 0.5) {
-        status = 'Em análise';
-      } else {
-        status = 'Aprovada';
-      }
-
-      const transaction = new Transaction({
-        valor,
-        idUser,
-        status
-      });
-
+      const transaction = new Transaction({ valor, idUser, status });
       const response = await transaction.save();
 
-      // if (status === 'Em análise') {
-      //   const idTransaction = response._id.toString();
-      //   const { authorization } = req.headers;
-      //   const body = { clientId: response.idUser, transactionId: idTransaction }
-      //   console.log(body);
-
-
-
-
-      //   const dataAnalysis = await fetch(
-      //     'http://localhost:3000/api/admin/analysis',
-      //     {
-      //       method: 'post',
-      //       body: JSON.stringify(),
-      //       headers: { 'Content-Type': 'application/json', 'Authorization': authorization }
-      //     }
-      //   );
-      //   // console.log('dataAnalysis: ', dataAnalysis);
-      //   // const responseCartao = await dataCartao.json();
-      //   // if (responseCartao.message) {
-      //   //   return res.status(dataCartao.status).json(responseCartao)
-      //   // }
-      //   // const idUser = responseCartao.id;
-      //   return res.status(303).set('Location', `/api/admin/transactions/${idTransaction}`);
-      // }
+      if (status === 'Em análise') {
+        const idTransaction = response._id.toString();
+        const analysis = await createAnalysis(res, response);
+        if (typeof analysis !== 'string') {
+          return;
+        }
+        return res.status(303).set('Location', `/api/admin/transactions/${idTransaction}`);
+      }
 
       return res.status(201).json({ _id: response._id, status });
     } catch (error) {
