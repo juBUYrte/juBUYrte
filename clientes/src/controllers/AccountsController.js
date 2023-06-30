@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import passport from 'passport';
 import Account from '../models/Account.js';
 import goToken from '../authentication/auth.js';
-import createTokenClient from '../../soluctions/token.js';
+import createTokenClient from '../../solutions/token.js';
 
 dotenv.config();
 
