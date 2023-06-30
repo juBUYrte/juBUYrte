@@ -45,7 +45,7 @@ const analysisSchema = new mongoose.Schema(
       validate: {
         async validator(val) {
           try {
-            const token = await TokenGenerator.clients();
+            const token = await TokenGenerator.transactions();
             const config = {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -62,7 +62,7 @@ const analysisSchema = new mongoose.Schema(
             return false;
           }
         },
-        message: 'O id da transação deve ser um id válido, ou seja, deve ser referente a uma tranação existente.',
+        message: 'O id da transação deve ser um id válido, ou seja, deve ser referente a uma transação existente.',
       },
     },
     status: {
