@@ -1,7 +1,15 @@
 /* eslint-disable import/no-relative-packages */
+import axios from 'axios';
 import mongoose from 'mongoose';
-import User from '../../../clientes/src/models/User.js';
-import Transaction from '../../../transacoes/src/models/Transaction.js';
+import TokenGenerator from '../util/tokenGenerator';
+
+const CLIENTS_HOSTNAME = 'localhost';
+const CLIENTS_PORT = '3001';
+const CLIENTS_URL = `http://${CLIENTS_HOSTNAME}:${CLIENTS_PORT}/api/admin/users`;
+
+const TRANSACTION_HOSTNAME = 'localhost';
+const TRANSACTION_PORT = '3002';
+const TRANSACTION_URL = `http://${TRANSACTION_HOSTNAME}:${TRANSACTION_PORT}/api/admin/transactions`;
 
 const analysisSchema = new mongoose.Schema(
   {
@@ -11,9 +19,20 @@ const analysisSchema = new mongoose.Schema(
       validate: {
         async validator(val) {
           try {
-            const validClient = await User.findById(val);
-            return validClient;
-          } catch (error) {
+            const token = await TokenGenerator.clients();
+            const config = {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            };
+            const url = `${CLIENTS_URL}/${val}`;
+            const response = await axios.get(url, config);
+            if (response.status !== 200) {
+              return false;
+            }
+
+            return response.data;
+          } catch (err) {
             return false;
           }
         },
@@ -26,9 +45,20 @@ const analysisSchema = new mongoose.Schema(
       validate: {
         async validator(val) {
           try {
-            const validTransaction = await Transaction.findById(val);
-            return validTransaction;
-          } catch (error) {
+            const token = await TokenGenerator.clients();
+            const config = {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            };
+            const url = `${TRANSACTION_URL}/${val}`;
+            const response = await axios.get(url, config);
+            if (response.status !== 200) {
+              return false;
+            }
+
+            return response.data;
+          } catch (err) {
             return false;
           }
         },

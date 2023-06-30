@@ -23,17 +23,12 @@ class AnalysisController {
     });
 
     try {
-      await fetchClient(analysis.clientId);
-    } catch (err) {
-      return res.status(500).send({ message: 'ClientID não encontrada nos serviços de clients' });
-    }
-
-    await analysis.save((err, newAnalysis) => {
-      if (err) {
-        return res.status(500).send({ message: err.message });
-      }
+      const newAnalysis = await analysis.save();
       return res.status(201).set('Location', `api/admin/analysis/${analysis.id}`).send(newAnalysis);
-    });
+    } catch (err) {
+      console.log(err);
+      return res.sendStatus(400);
+    }
   };
 
   static findUnderReviewAnalysis = async (_req, res) => {

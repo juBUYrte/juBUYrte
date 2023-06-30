@@ -9,8 +9,8 @@
         "dev": "nodemon server.js",
         "lint": "eslint ./**/**/*.js",
         "lint:fix": "eslint ./**/**/*.js --fix",
-        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --detectOpenHandles && NODE_ENV = 'test'",
-        "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --detectOpenHandles --watch && NODE_ENV = 'test'"
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --forceExit && NODE_ENV = 'test'",
+        "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --forceExit --watch && NODE_ENV = 'test'"
     },
     "author": "",
     "license": "MIT",
