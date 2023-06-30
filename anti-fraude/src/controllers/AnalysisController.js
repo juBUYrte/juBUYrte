@@ -26,12 +26,6 @@ class AnalysisController {
       createdDate: Date(),
     });
 
-    try {
-      await fetchClient(analysis.clientId);
-    } catch (err) {
-      return res.status(500).send({ message: 'ClientID não encontrada nos serviços de clients' });
-    }
-
     await analysis.save((err, newAnalysis) => {
       if (err) {
         return res.status(500).send({ message: err.message });
@@ -40,22 +34,22 @@ class AnalysisController {
         _id: newAnalysis.id,
         clientId: newAnalysis.clientId,
         transactionId: newAnalysis.transactionId,
-        "_links": {
-          "self": {
+        _links: {
+          self: {
             method: 'GET',
             href: `${URL}/analysis/${newAnalysis.id}`,
           },
-          "Aprovar": {
+          Aprovar: {
             method: 'PATCH',
             href: `${URL}/analysis/${newAnalysis.id}`,
-            body: {status: 'Aprovada'}
+            body: { status: 'Aprovada' },
           },
-          "Rejeitar": {
+          Rejeitar: {
             method: 'PATCH',
             href: `${URL}/analysis/${newAnalysis.id}`,
-            body: {status: 'Rejeitada'}
-          }
-        }
+            body: { status: 'Rejeitada' },
+          },
+        },
       };
 
       return res.status(201).set('Location', `api/admin/analysis/${analysis.id}`).send(newAnalysisResponse);
@@ -87,7 +81,7 @@ class AnalysisController {
       return res.status(error.status || 500).send({ message: error.message });
     }
   };
-  
+
   static findWithDetailsById = async (req, res) => {
     const { id } = req.params;
 
@@ -106,28 +100,28 @@ class AnalysisController {
   };
 
   static updateAnalysisAndTransaction = async (req, res) => {
-      const { id } = req.params;
-      const { status } = req.body;
+    const { id } = req.params;
+    const { status } = req.body;
 
-      try {
-        const analysis = await Analysis.findById(id);
+    try {
+      const analysis = await Analysis.findById(id);
 
-        if(!analysis) {
-          return res.status(404).send({ message: 'Nenhuma analise encontrada com o ID informado'});
-        }
-
-        if(!(analysis.status === 'Em Análise')) {
-          return res.status(400).send({ message: `O status da análise esta '${analysis.status}' e não pode ser atualizado.`});
-        }
-
-        await Analysis.findByIdAndUpdate(id, {$set: {status: status}});
-        await updateTransaction(analysis.transactionId, status);
-        
-        return res.status(204).set('Location', `/admin/analysis/${analysis._id}`).send();
-      } catch (error) {
-        return res.status(500).send({ message: error.message});
+      if (!analysis) {
+        return res.status(404).send({ message: 'Nenhuma analise encontrada com o ID informado' });
       }
-  }
+
+      if (!(analysis.status === 'Em Análise')) {
+        return res.status(400).send({ message: `O status da análise esta '${analysis.status}' e não pode ser atualizado.` });
+      }
+
+      await Analysis.findByIdAndUpdate(id, { $set: { status } });
+      await updateTransaction(analysis.transactionId, status);
+
+      return res.status(204).set('Location', `/admin/analysis/${analysis._id}`).send();
+    } catch (error) {
+      return res.status(500).send({ message: error.message });
+    }
+  };
 }
 
 export default AnalysisController;

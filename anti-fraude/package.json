@@ -7,10 +7,10 @@
     "scripts": {
         "start": "node server.js",
         "dev": "nodemon server.js",
-        "lint": "eslint ./src/**/*.js",
-        "lint:fix": "eslint ./src/**/*.js --fix",
-        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose",
-        "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --watch"
+        "lint": "eslint ./**/**/*.js",
+        "lint:fix": "eslint ./**/**/*.js --fix",
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --forceExit && NODE_ENV = 'test'",
+        "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --forceExit --watch && NODE_ENV = 'test'"
     },
     "author": "",
     "license": "MIT",
@@ -21,6 +21,7 @@
         "express": "^4.17.3",
         "jsonwebtoken": "^9.0.0",
         "mongoose": "^6.2.6",
+        "node-fetch": "^3.3.1",
         "passport": "^0.6.0",
         "passport-http-bearer": "^1.0.1",
         "passport-local": "^1.0.0",
@@ -29,10 +30,11 @@
     },
     "devDependencies": {
         "@jest/globals": "28.1.2",
+        "@types/jest": "^29.5.2",
         "eslint": "^8.39.0",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-plugin-import": "^2.27.5",
-        "jest": "28.1.2",
+        "jest": "^28.1.2",
         "nodemon": "^2.0.15",
         "supertest": "6.2.4"
     }
