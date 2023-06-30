@@ -4,14 +4,41 @@ info:
   description: |-
     API do microsserviço de Clientes
   version: 0.0.1
+tags:
+  - name: accounts
+  - name: users
+  - name: cards
+servers:
+  - url: http://localhost:3001
 paths:
+  /api/accounts/login:
+    post:
+      tags:
+        - accounts
+      summary: Account Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        '204':
+          description: ok
+        '400':
+          description: Bad Request
   /api/admin/accounts:
     get:
+      security:
+        - auth: []
+      tags:
+        - accounts
       summary: List accounts
       description: List all accounts
       responses:
         '200':
           description: ok
+        '500':
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -19,6 +46,8 @@ paths:
                 items:
                   $ref: "#/components/schemas/Account"
     post:
+      tags:
+        - accounts
       summary: Add account
       description: Add new account
       requestBody:
@@ -29,14 +58,20 @@ paths:
       responses:
         '201':
           description: created
+        '409':
+          description: Conflict
+        '500':
+          description: Internal server error
           content:
             application/json:
               schema:
                   $ref: "#/components/schemas/Account"
-        '401':
-          description: unauthorized
   /api/admin/accounts/{id}:
     get:
+      security:
+        - auth: []
+      tags:
+        - accounts
       summary: Find account
       description: Find one specific account
       parameters:
@@ -53,11 +88,15 @@ paths:
             application/json:
               schema:
                   $ref: "#/components/schemas/Account"
-        '400':
-          description: invalid ID supplied
+        '500':
+          description: Internal server error
         '404':
           description: not found
     put:
+      security:
+        - auth: []
+      tags:
+        - accounts
       summary: Update account
       description: Update account by entering the whole updated account
       parameters:
@@ -73,17 +112,23 @@ paths:
             schema:
                 $ref: "#/components/schemas/Account"
       responses:
-        '200':
+        '204':
           description: ok
           content:
             application/json:
               schema:
                   $ref: "#/components/schemas/Account"
         '400':
-          description: invalid ID supplied
-        '401':
-          description: unauthorized
+          description: Bad Request
+        '404':
+          description: Not found
+        '500': 
+          description: Internal server error
     delete:
+      security:
+        - auth: []
+      tags:
+        - accounts
       summary: Delete account
       description: Delete account by entering its ID
       parameters:
@@ -95,11 +140,148 @@ paths:
           type: string
       responses:
         '204':
-          description: no content
-        '401':
-          description: unauthorized
+          description: ok
+        '404':
+          description: Not found
+        '500':
+          description: Bad request
+  /api/admin/users:
+    get:
+      security:
+        - auth: []
+      tags:
+      - users
+      summary: List users
+      description: List all users
+      responses:
+        '200':
+          description: ok
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Account"
+    post:
+      security:
+        - auth: []
+      tags:
+      - users
+      summary: Add user
+      description: Add new user
+      responses:
+        '201':
+          description: ok
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Account"
+  /api/admin/users/{id}:
+    get:
+      security:
+        - auth: []
+      tags:
+      - users
+      summary: List user
+      description: List user by ID
+      parameters:
+      - name: id
+        in: path
+        description: ID of account that needs to be updated
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ok
         '400':
-          description: invalid ID supplied
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Account"
+    delete:
+      security:
+        - auth: []
+      tags:
+        - users
+      summary: Delete user
+      description: Delete user by entering its ID
+      parameters:
+      - name: id
+        in: path
+        description: ID of user that needs to be deleted
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ok
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal server error
+  /api/admin/users/cards:
+    post:
+      security:
+        - auth: []
+      tags:
+      - cards
+      summary: validate card
+      responses:
+        '200':
+          description: ok
+        '400':
+          description: Bad request
+        '404':
+          description: not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cards"
+  /api/admin/users/cards/{id}:
+    get:
+      security:
+        - auth: []
+      tags:
+      - cards
+      summary: Get rent
+      description: Get rent by card ID
+      parameters:
+      - name: id
+        in: path
+        description: ID of card that rent will be checked
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ok
+        '404': 
+          description: Not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cards"
+
 components:
   schemas:
     Account:
@@ -115,3 +297,28 @@ components:
         senha:
           type: string
           format: password
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        senha:
+          type: string
+          format: password
+    Cards:
+      type: object
+      properties:
+        numero:
+          type: string
+        nome:
+          type: string
+        validade:
+          type: string
+        codigo:
+          type: string
+  securitySchemes:
+    auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,5 +1,19 @@
 import Users from '../models/User.js';
 
+const cartaoTest = {
+  numero: '1234432156788765',
+  nome: 'carol fake',
+  validade: '12/30',
+  codigo: '789',
+  vencimento: '12',
+};
+
+const startCript = (dados) => {
+  const keysCart = Object.keys(dados);
+  const valuesCart = Object.values(dados);
+};
+startCript(cartaoTest);
+
 class UserController {
   static getAll = async (_req, res) => {
     try {
@@ -46,5 +60,4 @@ class UserController {
     }
   };
 }
-
 export default UserController;

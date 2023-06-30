@@ -1,7 +1,7 @@
 /* eslint-disable import/no-relative-packages */
 import axios from 'axios';
 import mongoose from 'mongoose';
-import TokenGenerator from '../util/tokenGenerator';
+import TokenGenerator from '../util/tokenGenerator.js';
 
 const CLIENTS_HOSTNAME = 'localhost';
 const CLIENTS_PORT = '3001';

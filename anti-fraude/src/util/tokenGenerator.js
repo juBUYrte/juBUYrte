@@ -1,7 +1,5 @@
 /* eslint-disable import/no-relative-packages */
-import axios from 'axios';
-import Users from '../../../clientes/src/models/User';
-import Transaction from '../../../transacoes/src/models/Transaction';
+import fetch from 'node-fetch';
 
 const CLIENTS_HOSTNAME = 'localhost';
 const CLIENTS_PORT = '3001';
@@ -15,20 +13,30 @@ export default class TokenGenerator {
   static async clients() {
     const adminRoleAccount = {
       nome: 'Admin',
-      email: 'admin@admin.com',
+      email: 'admin@mail.com',
       senha: 'admin',
     };
 
-    let admin = await Users.findOne({ email: adminRoleAccount.email });
-
-    if (!admin) {
-      admin = await axios.post(`${CLIENTS_URL}/api/admin/accounts`, adminRoleAccount);
-    }
+    await fetch(
+      `${CLIENTS_URL}/api/admin/accounts`,
+      {
+        method: 'post',
+        body: JSON.stringify(adminRoleAccount),
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
 
     delete adminRoleAccount.nome;
-    const loggedAdminToken = await axios.post(`${CLIENTS_URL}/api/accounts/login`, adminRoleAccount);
+    const loggedAdminToken = await fetch(
+      `${CLIENTS_URL}/api/accounts/login`,
+      {
+        method: 'post',
+        body: JSON.stringify(adminRoleAccount),
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
 
-    return loggedAdminToken;
+    return loggedAdminToken.headers.get('authorization').split(' ')[1];
   }
 
   static async transactions() {
@@ -38,15 +46,25 @@ export default class TokenGenerator {
       senha: 'admin',
     };
 
-    let admin = await Transaction.findOne({ email: adminRoleAccount.email });
-
-    if (!admin) {
-      admin = await axios.post(`${TRANSACTION_URL}/api/admin/accounts`, adminRoleAccount);
-    }
+    await fetch(
+      `${TRANSACTION_URL}/api/admin/accounts`,
+      {
+        method: 'post',
+        body: JSON.stringify(adminRoleAccount),
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
 
     delete adminRoleAccount.nome;
-    const loggedAdminToken = await axios.post(`${TRANSACTION_URL}/api/accounts/login`, adminRoleAccount);
+    const loggedAdminToken = await fetch(
+      `${TRANSACTION_URL}/api/accounts/login`,
+      {
+        method: 'post',
+        body: JSON.stringify(adminRoleAccount),
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
 
-    return loggedAdminToken;
+    return loggedAdminToken.headers.get('authorization').split(' ')[1];
   }
 }

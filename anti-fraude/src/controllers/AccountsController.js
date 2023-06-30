@@ -75,7 +75,7 @@ class AccountController {
 
     const token = this._createToken(user.id);
 
-    return res.status(200).send({ token });
+    return res.status(204).header('Authorization', `Bearer ${token}`).send();
   };
 
   static updateAccount = (req, res) => {
