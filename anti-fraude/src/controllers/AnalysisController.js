@@ -5,6 +5,10 @@ import Analysis from '../models/Analysis.js';
 import fetchClient from '../util/fetchClients.js';
 import updateTransaction from '../util/fetchTransaction.js';
 
+const HOSTNAME = process.env.ANTI_FRAUDE_HOSTNAME || 'localhost';
+const PORT = process.env.ANTI_FRAUDE_PORT || '3000';
+const URL = `http://${HOSTNAME}:${PORT}/api/admin`;
+
 class AnalysisController {
   static _verifyAnalysis = async (id) => {
     const analysis = await Analysis.findById(id);
@@ -32,7 +36,29 @@ class AnalysisController {
       if (err) {
         return res.status(500).send({ message: err.message });
       }
-      return res.status(201).set('Location', `api/admin/analysis/${analysis.id}`).send(newAnalysis);
+      const newAnalysisResponse = {
+        _id: newAnalysis.id,
+        clientId: newAnalysis.clientId,
+        transactionId: newAnalysis.transactionId,
+        "_links": {
+          "self": {
+            method: 'GET',
+            href: `${URL}/analysis/${newAnalysis.id}`,
+          },
+          "Aprovar": {
+            method: 'PATCH',
+            href: `${URL}/analysis/${newAnalysis.id}`,
+            body: {status: 'Aprovada'}
+          },
+          "Rejeitar": {
+            method: 'PATCH',
+            href: `${URL}/analysis/${newAnalysis.id}`,
+            body: {status: 'Rejeitada'}
+          }
+        }
+      };
+
+      return res.status(201).set('Location', `api/admin/analysis/${analysis.id}`).send(newAnalysisResponse);
     });
   };
 

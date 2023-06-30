@@ -9,6 +9,6 @@ router
   .get('/api/admin/analysis', authTokenMiddleware, AnalysisController.findUnderReviewAnalysis)
   .get('/api/admin/analysis/:id', AnalysisController.findWithDetailsById)
   .delete('/api/admin/analysis/:id', authTokenMiddleware, AnalysisController.deleteAnalysis)
-  .put('/api/admin/analysis/:id', AnalysisController.updateAnalysisAndTransaction);
+  .patch('/api/admin/analysis/:id', AnalysisController.updateAnalysisAndTransaction);
 
 export default router;
