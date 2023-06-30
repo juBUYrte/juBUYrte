@@ -1,17 +1,41 @@
 openapi: 3.0.3
 info:
-  title: Clientes API
+  title: Antifraude API
   description: |-
-    API do microsserviço de Clientes
+    API do microsserviço de Antifraude
   version: 0.0.1
+tags:
+  - name: accounts
+  - name: analysis
 paths:
+  /api/accounts/login:
+    post:
+      tags:
+        - accounts
+      summary: Account Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        '200':
+          description: ok
+        '401':
+          description: Unauthorized
   /api/admin/accounts:
     get:
+      security:
+        - auth: []
+      tags:
+        - accounts
       summary: List accounts
       description: List all accounts
       responses:
         '200':
           description: ok
+        '500':
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -19,6 +43,8 @@ paths:
                 items:
                   $ref: "#/components/schemas/Account"
     post:
+      tags:
+        - accounts
       summary: Add account
       description: Add new account
       requestBody:
@@ -33,10 +59,14 @@ paths:
             application/json:
               schema:
                   $ref: "#/components/schemas/Account"
-        '401':
-          description: unauthorized
+        '500':
+          description: Internal Server Error
   /api/admin/accounts/{id}:
     get:
+      security:
+        - auth: []
+      tags:
+        - accounts
       summary: Find account
       description: Find one specific account
       parameters:
@@ -53,11 +83,15 @@ paths:
             application/json:
               schema:
                   $ref: "#/components/schemas/Account"
-        '400':
-          description: invalid ID supplied
+        '500':
+          description: Internal Server Error
         '404':
           description: not found
     put:
+      security:
+        - auth: []
+      tags:
+        - accounts
       summary: Update account
       description: Update account by entering the whole updated account
       parameters:
@@ -73,17 +107,19 @@ paths:
             schema:
                 $ref: "#/components/schemas/Account"
       responses:
-        '200':
+        '204':
           description: ok
           content:
             application/json:
               schema:
                   $ref: "#/components/schemas/Account"
-        '400':
-          description: invalid ID supplied
-        '401':
-          description: unauthorized
+        '500':
+          description: Internal Server Error
     delete:
+      security:
+        - auth: []
+      tags:
+        - accounts
       summary: Delete account
       description: Delete account by entering its ID
       parameters:
@@ -95,11 +131,132 @@ paths:
           type: string
       responses:
         '204':
-          description: no content
-        '401':
-          description: unauthorized
+          description: ok
+        '500':
+          description: Internal Server Error
+  /api/admin/analysis:
+    get:
+      security:
+        - auth: []
+      tags:
+        - analysis
+      summary: List accounts
+      description: List all accounts
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Analysis"
+    post:
+      security:
+        - auth: []
+      tags:
+        - analysis
+      summary: Create analysis
+      description: Create new analysis
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Analysis"
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/Analysis"
+        '500':
+          description: Internal Server Error
+  /api/admin/analysis/{id}:
+    get:
+      security:
+        - auth: []
+      tags:
+        - analysis
+      summary: Find analysis
+      description: Find analysis by ID
+      parameters:
+        - name: id
+          in: path
+          description: ID of analysis that needs to be fetched
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ok
+        '404':
+          description: Not found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Analysis"
+    patch:
+      security:
+        - auth: []
+      tags:
+        - analysis
+      summary: Update analysis
+      description: Update analysis and transactions
+      parameters:
+        - name: id
+          in: path
+          description: ID of account that needs to be fetched
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Analysis"
+      responses:
+        '204':
+          description: created
+          content:
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/Analysis"
+        '404':
+          description: Not Found
         '400':
-          description: invalid ID supplied
+          description: Bad Request
+        '500': 
+          description: Internal Server Error
+    delete:
+      security:
+        - auth: []
+      tags:
+        - analysis
+      summary: Delete analysis
+      description: Delete analysis by ID
+      parameters:
+        - name: id
+          in: path
+          description: ID of analysis that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/Analysis"
+        '422':
+          description: Invalid ID
+        '500':
+          description: Internal server error
 components:
   schemas:
     Account:
@@ -115,3 +272,26 @@ components:
         senha:
           type: string
           format: password
+    Analysis:
+      type: object
+      properties:
+        clientId:
+          type: string
+        transactionId:
+          type: string
+        status:
+          type: string
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        senha:
+          type: string
+          format: password
+  securitySchemes:
+    auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
