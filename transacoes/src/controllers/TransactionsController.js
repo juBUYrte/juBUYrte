@@ -1,67 +1,8 @@
-import fetch from 'node-fetch';
-
 import Transaction from '../models/Transaction.js';
 
 import createToken from '../../solutions/token.js';
+import { createAnalysis, getClientId, getClientRent } from '../services/TransactionsServices.js';
 
-const createAnalysis = async (res, transaction) => {
-  const tokenAntiFraude = await createToken(3000);
-  const clientId = transaction.idUser;
-  const transactionId = transaction._id.toString();
-
-  const body = { clientId, transactionId };
-
-  const data = await fetch(
-    'http://localhost:3000/api/admin/analysis',
-    {
-      method: 'post',
-      body: JSON.stringify(body),
-      headers: { 'Content-Type': 'application/json', 'Authorization': tokenAntiFraude }
-    }
-  );
-  const responseAnalise = await data.json();
-
-  if (responseAnalise.message) {
-    return res.status(data.status).json(responseAnalise)
-  }
-
-  return 'OK';
-}
-
-const getClientId = async (res, dadosDoCartao, tokenClient) => {
-  const dataCartao = await fetch('http://localhost:3001/api/admin/users/cards', {
-    method: 'post',
-    body: JSON.stringify(dadosDoCartao),
-    headers: { 'Content-Type': 'application/json', 'Authorization': tokenClient }
-  });
-
-  const responseCartao = await dataCartao.json();
-
-  if (responseCartao.message) {
-    return res.status(dataCartao.status).json(responseCartao);
-  }
-
-  const idUser = responseCartao.id;
-  return idUser;
-}
-
-const getClientRent = async (res, idUser, tokenClient) => {
-  const dataRent = await fetch(`http://localhost:3001/api/admin/users/cards/${idUser}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': tokenClient
-    }
-  });
-
-  const responseRent = await dataRent.json();
-
-  if (responseRent.message) {
-    return res.status(dataRent.status).json(responseRent);
-  }
-
-  const rent = responseRent.rent;
-  return rent;
-}
 class TransactionsController {
   static getAllTransactions = (_, res) => {
     Transaction.find((err, transactions) => {
@@ -97,13 +38,19 @@ class TransactionsController {
       const transaction = new Transaction({ valor, idUser, status });
       const response = await transaction.save();
 
+
       if (status === 'Em análise') {
         const idTransaction = response._id.toString();
         const analysis = await createAnalysis(res, response);
+
         if (typeof analysis !== 'string') {
           return;
         }
-        return res.status(303).set('Location', `/api/admin/transactions/${idTransaction}`);
+
+        const token = req.headers.authorization;
+        res.set('Location', `/api/admin/transactions/${idTransaction}`)
+        res.set('Authorization', token);
+        return res.status(303).end();
       }
 
       return res.status(201).json({ _id: response._id, status });
