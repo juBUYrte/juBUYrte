@@ -1,9 +1,10 @@
+/* eslint-disable import/no-cycle */
 import bcrypt from 'bcryptjs';
-// import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import passport from 'passport';
 import Account from '../models/Account.js';
 import goToken from '../authentication/auth.js';
+import createTokenClient from '../../soluctions/token.js';
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ class AccountController {
     })(req, res, next);
   };
 
-  static findAccounts = (_req, res) => {
+  static findAccounts = async (_req, res) => {
     Account.find((err, allAccounts) => {
       if (err) {
         return res.status(500).send({ message: err.message });

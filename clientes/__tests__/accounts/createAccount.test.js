@@ -3,6 +3,9 @@ import {
   describe, expect, it,
 } from '@jest/globals';
 import app from '../../src/app.js';
+import createTokenClient from '../../soluctions/token.js';
+
+const tokenAcess = await createTokenClient();
 
 describe('Testes da rota de POST /api/admin/accounts', () => {
   it('Deve criar um Account', async () => {
@@ -24,9 +27,9 @@ describe('Testes da rota de POST /api/admin/accounts', () => {
     expect(typeof resp.body._id).toBe('string');
 
     const { _id } = resp.body;
-    console.log(_id);
     await request(app)
-      .delete(`/api/admin/accounts/${_id}`);
+      .delete(`/api/admin/accounts/${_id}`)
+      .set({ Authorization: `Bearer ${tokenAcess}` });
   });
   it('Deve retornar um erro 409, quando passado email existente', async () => {
     const invalidAccount = {
