@@ -55,6 +55,32 @@ class TransactionsController {
 
       const response = await transaction.save();
 
+      // if (status === 'Em análise') {
+      //   const idTransaction = response._id.toString();
+      //   const { authorization } = req.headers;
+      //   const body = { clientId: response.idUser, transactionId: idTransaction }
+      //   console.log(body);
+
+
+
+
+      //   const dataAnalysis = await fetch(
+      //     'http://localhost:3000/api/admin/analysis',
+      //     {
+      //       method: 'post',
+      //       body: JSON.stringify(),
+      //       headers: { 'Content-Type': 'application/json', 'Authorization': authorization }
+      //     }
+      //   );
+      //   // console.log('dataAnalysis: ', dataAnalysis);
+      //   // const responseCartao = await dataCartao.json();
+      //   // if (responseCartao.message) {
+      //   //   return res.status(dataCartao.status).json(responseCartao)
+      //   // }
+      //   // const idUser = responseCartao.id;
+      //   return res.status(303).set('Location', `/api/admin/transactions/${idTransaction}`);
+      // }
+
       return res.status(201).json({ _id: response._id, status });
     } catch (error) {
       return res.status(500).json({ message: error.message });
@@ -94,7 +120,7 @@ class TransactionsController {
         if (err) {
           return res.status(500).send({ message: err.message });
         }
-        return res.sendStatus(200);
+        return res.sendStatus(204);
       });
     });
   }
