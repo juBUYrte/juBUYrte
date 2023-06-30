@@ -3,7 +3,7 @@ import {
   describe, it,
 } from '@jest/globals';
 import app from '../../src/app.js';
-import createTokenClient from '../../soluctions/token.js';
+import createTokenClient from '../../solutions/token.js';
 
 const tokenAcess = await createTokenClient();
 
