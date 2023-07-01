@@ -3,6 +3,7 @@
 import supertest from 'supertest';
 import app from '../../src/app.js';
 import createNewAccount from '../factory/accountsFactory.js';
+import { createRejectedAndApprovedAnalysis, createUnderReviewAnalysis } from '../factory/analysisFactory.js';
 import createNewCliente from '../factory/clientFactory.js';
 import createNewTransaction from '../factory/transactionsFactory.js';
 import {
@@ -133,6 +134,86 @@ describe('POST api/admin/analysis - Criação de análise', () => {
         await deleteCreatedClient(transactionRequest.userId);
         await deleteCreatedTransaction(analysis.transactionId);
       });
+    });
+  });
+});
+
+describe('GET api/admin/analysis - Listagem de análise em revisão (status "Em análise))', () => {
+  it('Deve responder com status 401 e uma mensagem de erro, caso não seja fornecido header', async () => {
+    const response = await request.post('/api/admin/analysis').send(validAnalysis);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+    }));
+  });
+
+  it('Deve responder com status 401 e uma mensagem de erro, caso seja fornecido o header, porém sem token', async () => {
+    const response = await request.post('/api/admin/analysis').set('Authorization', '').send(validAnalysis);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+    }));
+  });
+
+  it('Deve responder com status 400 e uma mensagem de erro, caso seja fornecido um token inválido', async () => {
+    const invalidToken = 'INVALID_TOKEN';
+    const response = await request.post('/api/admin/analysis').set('Authorization', `Bearer ${invalidToken}`).send(validAnalysis);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+    }));
+  });
+
+  describe('Quando o token for válido', () => {
+    let clientId;
+    let transactionId;
+
+    it('deverá retornar status 200 e uma array vazia, quando não houver análises em revisão', async () => {
+      const newAccount = await createNewAccount();
+      const validToken = createValidToken(newAccount._id.toHexString());
+      const response = await request.get('/api/admin/analysis').set('Authorization', `Bearer ${validToken}`);
+
+      expect(response.body.length).toBe(0);
+      expect(response.status).toBe(200);
+    });
+
+    it('deverá retornar status 200 e uma array vazia, quando só houver análises aprovadas e/ou rejeitadas.', async () => {
+      const newAccount = await createNewAccount();
+      const validToken = createValidToken(newAccount._id.toHexString());
+      const transactionRequest = await createNewTransaction();
+      clientId = transactionRequest.userId;
+      transactionId = transactionRequest.newTransaction.data._id;
+
+      await createRejectedAndApprovedAnalysis(clientId, transactionId);
+
+      const response = await request.get('/api/admin/analysis').set('Authorization', `Bearer ${validToken}`);
+
+      expect(response.body.length).toBe(0);
+      expect(response.status).toBe(200);
+    });
+
+    it('deverá retornar status 200 e a lista de análises em revisão, contendo as informações necessárias', async () => {
+      const newAccount = await createNewAccount();
+      const validToken = createValidToken(newAccount._id.toHexString());
+      await createUnderReviewAnalysis(clientId, transactionId);
+
+      const response = await request.get('/api/admin/analysis').set('Authorization', `Bearer ${validToken}`);
+
+      expect(response.body.length).toBe(4);
+      expect(response.body[0]).toEqual(expect.objectContaining({
+        __v: expect.any(Number),
+        _id: expect.any(String),
+        clientId: expect.any(String),
+        status: 'Em análise',
+        transactionId: expect.any(String),
+      }));
+      expect(response.status).toBe(200);
+
+      await deleteCreatedClient(clientId);
+      await deleteCreatedTransaction(transactionId);
     });
   });
 });

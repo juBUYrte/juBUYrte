@@ -18,7 +18,7 @@ export default async function createNewCliente() {
   const clientData = {
     nome: 'Joao Teste',
     cpf: '12345677910',
-    email: 'resetado4@gmail.com',
+    email: 'resetado8@gmail.com',
     telefone: '8399959999',
     rendaMensal: '14800',
     endereço: {
