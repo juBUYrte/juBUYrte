@@ -64,4 +64,16 @@ async function createUnderReviewAnalysis(clientId, transactionId) {
   return analysisList;
 }
 
-export { createRejectedAndApprovedAnalysis, createUnderReviewAnalysis };
+async function createSimpleAnalysis(clientId, transactionId) {
+  const analysisList = await Analysis.create(
+    {
+      clientId,
+      transactionId,
+      status: 'Em análise',
+    },
+  );
+
+  return analysisList;
+}
+
+export { createRejectedAndApprovedAnalysis, createUnderReviewAnalysis, createSimpleAnalysis };

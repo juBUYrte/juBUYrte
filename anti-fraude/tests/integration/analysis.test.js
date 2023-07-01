@@ -3,7 +3,7 @@
 import supertest from 'supertest';
 import app from '../../src/app.js';
 import createNewAccount from '../factory/accountsFactory.js';
-import { createRejectedAndApprovedAnalysis, createUnderReviewAnalysis } from '../factory/analysisFactory.js';
+import { createRejectedAndApprovedAnalysis, createSimpleAnalysis, createUnderReviewAnalysis } from '../factory/analysisFactory.js';
 import createNewCliente from '../factory/clientFactory.js';
 import createNewTransaction from '../factory/transactionsFactory.js';
 import {
@@ -79,7 +79,7 @@ describe('POST api/admin/analysis - Criação de análise', () => {
         message: expect.any(String),
       }));
       expect(response.status).toBe(400);
-      await deleteCreatedClient(transactionRequest.userId);
+      await deleteCreatedClient(transactionRequest.newUser.data._id);
       await deleteCreatedTransaction(analysis.transactionId);
     });
 
@@ -101,14 +101,14 @@ describe('POST api/admin/analysis - Criação de análise', () => {
       const newAccount = await createNewAccount();
       const validToken = createValidToken(newAccount._id.toHexString());
       const transactionRequest = await createNewTransaction();
-      const analysis = invalidAnalysis(transactionRequest.userId, transactionRequest.newTransaction.data._id, 'STATUS_INVÁLIDO');
+      const analysis = invalidAnalysis(transactionRequest.newUser.data._id, transactionRequest.newTransaction.data._id, 'STATUS_INVÁLIDO');
 
       const response = await request.post('/api/admin/analysis').set('Authorization', `Bearer ${validToken}`).send(analysis);
       expect(response.body).toEqual(expect.objectContaining({
         message: expect.any(String),
       }));
       expect(response.status).toBe(400);
-      await deleteCreatedClient(transactionRequest.userId);
+      await deleteCreatedClient(transactionRequest.newUser.data._id);
       await deleteCreatedTransaction(analysis.transactionId);
     });
 
@@ -118,20 +118,20 @@ describe('POST api/admin/analysis - Criação de análise', () => {
         const validToken = createValidToken(newAccount._id.toHexString());
         const transactionRequest = await createNewTransaction();
         const analysis = {
-          clientId: transactionRequest.userId,
+          clientId: transactionRequest.newUser.data._id,
           transactionId: transactionRequest.newTransaction.data._id,
         };
 
         const response = await request.post('/api/admin/analysis').set('Authorization', `Bearer ${validToken}`).send(analysis);
         expect(response.body).toEqual(expect.objectContaining({
-          clientId: transactionRequest.userId,
+          clientId: transactionRequest.newUser.data._id,
           transactionId: transactionRequest.newTransaction.data._id,
           status: 'Em análise',
           _id: expect.any(String),
           _links: expect.any(Object),
         }));
         expect(response.status).toBe(201);
-        await deleteCreatedClient(transactionRequest.userId);
+        await deleteCreatedClient(transactionRequest.newUser.data._id);
         await deleteCreatedTransaction(analysis.transactionId);
       });
     });
@@ -184,7 +184,7 @@ describe('GET api/admin/analysis - Listagem de análise em revisão (status "Em 
       const newAccount = await createNewAccount();
       const validToken = createValidToken(newAccount._id.toHexString());
       const transactionRequest = await createNewTransaction();
-      clientId = transactionRequest.userId;
+      clientId = transactionRequest.newUser.data._id;
       transactionId = transactionRequest.newTransaction.data._id;
 
       await createRejectedAndApprovedAnalysis(clientId, transactionId);
@@ -211,6 +211,72 @@ describe('GET api/admin/analysis - Listagem de análise em revisão (status "Em 
         transactionId: expect.any(String),
       }));
       expect(response.status).toBe(200);
+
+      await deleteCreatedClient(clientId);
+      await deleteCreatedTransaction(transactionId);
+    });
+  });
+});
+
+describe('GET api/admin/analysis/:id - Listagem de análise específica)', () => {
+  it('Deve responder com status 401 e uma mensagem de erro, caso não seja fornecido header', async () => {
+    const response = await request.post('/api/admin/analysis').send(validAnalysis);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+    }));
+  });
+
+  it('Deve responder com status 401 e uma mensagem de erro, caso seja fornecido o header, porém sem token', async () => {
+    const response = await request.post('/api/admin/analysis').set('Authorization', '').send(validAnalysis);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+    }));
+  });
+
+  it('Deve responder com status 400 e uma mensagem de erro, caso seja fornecido um token inválido', async () => {
+    const invalidToken = 'INVALID_TOKEN';
+    const response = await request.post('/api/admin/analysis').set('Authorization', `Bearer ${invalidToken}`).send(validAnalysis);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+    }));
+  });
+
+  describe('Quando o token for válido', () => {
+    it('deverá retornar status 404, caso seja passado um id inválido', async () => {
+      const newAccount = await createNewAccount();
+      const validToken = createValidToken(newAccount._id.toHexString());
+      const response = await request.get('/api/admin/analysis/ID_INEXISTENTE').set('Authorization', `Bearer ${validToken}`);
+
+      expect(response.status).toBe(500);
+    });
+
+    it('deverá retornar status 404, caso seja passado um id válido, mas não seja encontrada nenhuma análise com o id fornecido', async () => {
+      const newAccount = await createNewAccount();
+      const validToken = createValidToken(newAccount._id.toHexString());
+      const response = await request.get('/api/admin/analysis/649f9d3dc98547996f30f4a2').set('Authorization', `Bearer ${validToken}`);
+
+      expect(response.status).toBe(404);
+    });
+
+    it('deverá retornar status 200 e as informações da análise, juntamente com os dados do usuário respectivo', async () => {
+      const newAccount = await createNewAccount();
+      const validToken = createValidToken(newAccount._id.toHexString());
+      const transactionRequest = await createNewTransaction();
+
+      const clientId = transactionRequest.newUser.data._id;
+      const transactionId = transactionRequest.newTransaction.data._id;
+
+      const analysis = await createSimpleAnalysis(clientId, transactionId);
+
+      const response = await request.get(`/api/admin/analysis/${analysis._id.toHexString()}`).set('Authorization', `Bearer ${validToken}`);
+      expect(response.status).toBe(200);
+      expect(Object.keys(response.body)).toEqual(expect.arrayContaining(['analysis', 'dadosUsuario']));
 
       await deleteCreatedClient(clientId);
       await deleteCreatedTransaction(transactionId);

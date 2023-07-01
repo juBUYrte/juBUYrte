@@ -30,7 +30,7 @@ export default async function createNewTransaction() {
 
   try {
     const newTransaction = await axios.post(`${TRANSACTION_URL}/api/admin/transactions`, validTransactionData, config);
-    return { newTransaction, userId: newUser.data._id };
+    return { newTransaction, newUser };
   } catch (error) {
     return error;
   }
