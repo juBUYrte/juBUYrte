@@ -98,6 +98,20 @@ class TransactionsController {
       });
     });
   }
+
+  static deleteById = async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(id);
+      const resp = await Transaction.findByIdAndDelete(id);
+      if (!resp) {
+        res.status(400).json({ message: 'User not found' });
+      }
+      res.status(204).json(resp);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  };
 }
 
 export default TransactionsController;

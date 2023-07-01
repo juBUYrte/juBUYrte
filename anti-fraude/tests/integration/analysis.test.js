@@ -5,7 +5,9 @@ import app from '../../src/app.js';
 import createNewAccount from '../factory/accountsFactory.js';
 import createNewCliente from '../factory/clientFactory.js';
 import createNewTransaction from '../factory/transactionsFactory.js';
-import { cleanAnalysisDB, createValidToken, deleteCreatedClient } from '../utils.js';
+import {
+  cleanAnalysisDB, createValidToken, deleteCreatedClient, deleteCreatedTransaction,
+} from '../utils.js';
 
 let server;
 
@@ -65,42 +67,72 @@ describe('POST api/admin/analysis - Criação de análise', () => {
       transactionId,
       status,
     });
-    // it('deverá retornar status 400 e a respectiva mensagem de erro, ao fornecer um id inválido de um cliente', async () => {
-    //   const newAccount = await createNewAccount();
-    //   const validToken = createValidToken(newAccount._id.toHexString());
+    it('deverá retornar status 400 e a respectiva mensagem de erro, ao fornecer um id inválido de um cliente', async () => {
+      const newAccount = await createNewAccount();
+      const validToken = createValidToken(newAccount._id.toHexString());
+      const transactionRequest = await createNewTransaction();
+      const analysis = invalidAnalysis('ID_INVÁLIDO', transactionRequest.newTransaction.data._id, 'Aprovada');
 
-    //   const newTransaction = await createNewTransaction();
-    //   const analysis = invalidAnalysis('ID_INVÁLIDO', newTransaction._id.toHexString(), 'Aprovada');
+      const response = await request.post('/api/admin/analysis').set('Authorization', `Bearer ${validToken}`).send(analysis);
+      expect(response.body).toEqual(expect.objectContaining({
+        message: expect.any(String),
+      }));
+      expect(response.status).toBe(400);
+      await deleteCreatedClient(transactionRequest.userId);
+      await deleteCreatedTransaction(analysis.transactionId);
+    });
 
-    //   const response = await request.post('/api/admin/analysis').set('Authorization', `Bearer ${validToken}`).send(analysis);
+    it('deverá retornar status 400 e a respectiva mensagem de erro, ao fornecer um id inválido de uma transação', async () => {
+      const newAccount = await createNewAccount();
+      const validToken = createValidToken(newAccount._id.toHexString());
+      const newClient = await createNewCliente();
+      const analysis = invalidAnalysis(newClient.data._id, 'ID_INVÁLIDO', 'Aprovada');
 
-    //   expect(response.status).toBe(400);
-    // });
+      const response = await request.post('/api/admin/analysis').set('Authorization', `Bearer ${validToken}`).send(analysis);
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual(expect.objectContaining({
+        message: expect.any(String),
+      }));
+      await deleteCreatedClient(newClient.data._id);
+    });
 
-    // it('deverá retornar status 400 e a respectiva mensagem de erro, ao fornecer um id inválido de uma transação', async () => {
-    //   const newAccount = await createNewAccount();
-    //   const validToken = createValidToken(newAccount._id.toHexString());
-    //   const newClient = await createNewCliente();
-    //   const analysis = invalidAnalysis(newClient._id.toHexString(), 'ID_INVÁLIDO', 'Aprovada');
+    it('deverá retornar status 400 e a respectiva mensagem de erro, ao fornecer um status inválido', async () => {
+      const newAccount = await createNewAccount();
+      const validToken = createValidToken(newAccount._id.toHexString());
+      const transactionRequest = await createNewTransaction();
+      const analysis = invalidAnalysis(transactionRequest.userId, transactionRequest.newTransaction.data._id, 'STATUS_INVÁLIDO');
 
-    //   const response = await request.post('/api/admin/analysis').set('Authorization', `Bearer ${validToken}`).send(analysis);
-    //   console.log(response.body);
+      const response = await request.post('/api/admin/analysis').set('Authorization', `Bearer ${validToken}`).send(analysis);
+      expect(response.body).toEqual(expect.objectContaining({
+        message: expect.any(String),
+      }));
+      expect(response.status).toBe(400);
+      await deleteCreatedClient(transactionRequest.userId);
+      await deleteCreatedTransaction(analysis.transactionId);
+    });
 
-    //   expect(response.status).toBe(400);
+    describe('Quando o body fornecido for válido', () => {
+      it('deverá retornar status 201 e a análise criada, com status default "Em análise".', async () => {
+        const newAccount = await createNewAccount();
+        const validToken = createValidToken(newAccount._id.toHexString());
+        const transactionRequest = await createNewTransaction();
+        const analysis = {
+          clientId: transactionRequest.userId,
+          transactionId: transactionRequest.newTransaction.data._id,
+        };
 
-    //   deleteCreatedClient(response.body._id);
-    // });
-
-    // it('deverá retornar status 400 e a respectiva mensagem de erro, ao fornecer um status inválido', async () => {
-    //   const newAccount = await createNewAccount();
-    //   const validToken = createValidToken(newAccount._id.toHexString());
-    //   const newClient = await createNewCliente();
-    //   const newTransaction = await createNewTransaction();
-    //   const analysis = invalidAnalysis(newClient._id.toHexString(), newTransaction._id.toHexString(), 'STATUS_ERRADO');
-
-    //   const response = await request.post('/api/admin/analysis').set('Authorization', `Bearer ${validToken}`).send(analysis);
-
-    //   expect(response.status).toBe(400);
-    // });
+        const response = await request.post('/api/admin/analysis').set('Authorization', `Bearer ${validToken}`).send(analysis);
+        expect(response.body).toEqual(expect.objectContaining({
+          clientId: transactionRequest.userId,
+          transactionId: transactionRequest.newTransaction.data._id,
+          status: 'Em análise',
+          _id: expect.any(String),
+          _links: expect.any(Object),
+        }));
+        expect(response.status).toBe(201);
+        await deleteCreatedClient(transactionRequest.userId);
+        await deleteCreatedTransaction(analysis.transactionId);
+      });
+    });
   });
 });

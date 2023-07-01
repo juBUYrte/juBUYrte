@@ -67,8 +67,8 @@ const analysisSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['Em Análise', 'Aprovada', 'Rejeitada'],
-      default: 'Em Análise',
+      enum: ['Em análise', 'Aprovada', 'Rejeitada'],
+      default: 'Em análise',
     },
   },
 );

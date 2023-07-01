@@ -42,7 +42,7 @@ export default class TokenGenerator {
   static async transactions() {
     const adminRoleAccount = {
       nome: 'Admin',
-      email: 'admin@admin.com',
+      email: 'admin@mail.com',
       senha: 'admin',
     };
 
