@@ -18,9 +18,9 @@ class UserController {
   static getAll = async (_req, res) => {
     try {
       const resp = await Users.find({}, { dadosDoCartao: 0 });
-      res.status(200).json(resp);
+      return res.status(200).json(resp);
     } catch (err) {
-      res.status(500).json(err);
+      return res.status(500).json(err);
     }
   };
 

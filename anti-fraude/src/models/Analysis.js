@@ -45,7 +45,7 @@ const analysisSchema = new mongoose.Schema(
       validate: {
         async validator(val) {
           try {
-            const token = await TokenGenerator.clients();
+            const token = await TokenGenerator.transactions();
             const config = {
               headers: {
                 Authorization: `Bearer ${token}`,

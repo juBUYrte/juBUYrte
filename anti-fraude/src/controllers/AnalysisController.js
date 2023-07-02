@@ -13,8 +13,8 @@ class AnalysisController {
   static _verifyAnalysis = async (id) => {
     const analysis = await Analysis.findById(id);
 
-    if (!analysis) throw NotFoundError('Não há quaisquer produtos com o id informado. Por gentileza, refaça a operação.');
-    if (analysis.status === 'Em análise' || analysis.status === 'Rejeitada') throw UnauthorizedError('Não é possível deletar uma análise que ainda está sob revisão ou possui status "Rejeitada".');
+    if (!analysis) throw NotFoundError('Não há quaisquer análises com o id informado. Por gentileza, refaça a operação.');
+    if (analysis.status !== 'Aprovada') throw UnauthorizedError('Não é possível deletar uma análise que ainda está sob revisão ou possui status "Rejeitada".');
 
     return analysis;
   };
@@ -111,7 +111,7 @@ class AnalysisController {
         return res.status(404).send({ message: 'Nenhuma analise encontrada com o ID informado' });
       }
 
-      if (!(analysis.status === 'Em análise')) {
+      if (analysis.status !== 'Em análise') {
         return res.status(400).send({ message: `O status da análise esta '${analysis.status}' e não pode ser atualizado.` });
       }
 
@@ -120,6 +120,10 @@ class AnalysisController {
 
       return res.status(204).set('Location', `/admin/analysis/${analysis._id}`).send();
     } catch (error) {
+      if (error.name === 'CastError') {
+        return res.status(422).send({ message: 'O id informado é inválido, favor informe um id compatível com o tipo ObjectID' });
+      }
+      console.log(error);
       return res.status(500).send({ message: error.message });
     }
   };

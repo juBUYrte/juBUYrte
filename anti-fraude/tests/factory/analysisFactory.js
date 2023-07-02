@@ -64,12 +64,12 @@ async function createUnderReviewAnalysis(clientId, transactionId) {
   return analysisList;
 }
 
-async function createSimpleAnalysis(clientId, transactionId) {
+async function createSimpleAnalysis(clientId, transactionId, status = 'Em análise') {
   const analysisList = await Analysis.create(
     {
       clientId,
       transactionId,
-      status: 'Em análise',
+      status,
     },
   );
 

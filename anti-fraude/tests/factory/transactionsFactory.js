@@ -8,7 +8,7 @@ const TRANSACTION_HOSTNAME = 'localhost';
 const TRANSACTION_PORT = '3002';
 const TRANSACTION_URL = `http://${TRANSACTION_HOSTNAME}:${TRANSACTION_PORT}`;
 
-export default async function createNewTransaction() {
+export default async function createUserAndTransaction() {
   const token = await TokenGenerator.clients();
 
   const config = {
