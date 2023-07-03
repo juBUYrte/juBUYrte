@@ -105,7 +105,7 @@ class AnalysisController {
     const { status } = req.body;
 
     try {
-      const analysis = await Analysis.findById(id);
+      const analysis = await Analysis.findOne({ transactionId: id });
 
       if (!analysis) {
         return res.status(404).send({ message: 'Nenhuma analise encontrada com o ID informado' });
@@ -115,8 +115,8 @@ class AnalysisController {
         return res.status(400).send({ message: `O status da análise esta '${analysis.status}' e não pode ser atualizado.` });
       }
 
-      await Analysis.findByIdAndUpdate(id, { $set: { status } });
-      await updateTransaction(analysis.transactionId, status);
+      await Analysis.findByIdAndUpdate(analysis._id, { $set: { status } });
+      await updateTransaction(id, status);
 
       return res.status(204).set('Location', `/admin/analysis/${analysis._id}`).send();
     } catch (error) {

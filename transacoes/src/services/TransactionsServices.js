@@ -61,27 +61,4 @@ const getClientRent = async (res, idUser, tokenClient) => {
   return rent;
 }
 
-const getAnalysisId = async (res, transactionId) => {
-  const tokenAntiFraude = await createToken(3000, "anti-fraude");
-  const formatedTransactionId = transactionId.toString();
-
-  const data = await fetch('http://anti-fraude:3000/api/admin/analysis', {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': tokenAntiFraude
-    }
-  });
-
-  const response = await data.json();
-  const filter = response.find(item => item.transactionId == formatedTransactionId);
-  console.log('filter? ', filter);
-  console.log('response? ', response);
-  console.log('formatedTransactionId? ', formatedTransactionId);
-
-  if (response.message) {
-    return res.status(data.status).json(response);
-  }
-  return response.id;
-}
-
-export { createAnalysis, getClientId, getClientRent, getAnalysisId };
+export { createAnalysis, getClientId, getClientRent };

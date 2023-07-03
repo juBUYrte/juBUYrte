@@ -18,7 +18,7 @@ const updateTransaction = async (transactionId, status) => {
     const url = `${TRANSACTION_URL}/${transactionId}`;
     const dataBody = { status };
     const response = await axios.patch(url, dataBody, config);
-    if (response.status !== 200) {
+    if (response.message) {
       throw new Error(`${response.status} : ${response.data.message}`);
     }
 
