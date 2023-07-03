@@ -50,7 +50,7 @@ class TransactionsController {
           return;
         }
 
-        return analysis;
+        return res.status(201).json(analysis);
 
         // const token = req.headers.authorization;
         // res.set('Location', `/api/admin/transactions/${idTransaction}`)
