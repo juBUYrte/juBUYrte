@@ -1,7 +1,7 @@
 import Transaction from '../models/Transaction.js';
 
 import createToken from '../../solutions/token.js';
-import { createAnalysis, getClientId, getClientRent } from '../services/TransactionsServices.js';
+import { createAnalysis, getClientId, getClientRent, getAnalysisId } from '../services/TransactionsServices.js';
 
 const HOSTNAME = process.env.TRANSACOES_HOSTNAME || 'localhost';
 const PORT = process.env.TRANSACOES_PORT || '3002';
@@ -42,7 +42,6 @@ class TransactionsController {
       const transaction = new Transaction({ valor, idUser, status });
       const response = await transaction.save();
 
-
       if (status === 'Em análise') {
         const idTransaction = response._id.toString();
         const analysis = await createAnalysis(res, response);
@@ -51,10 +50,12 @@ class TransactionsController {
           return;
         }
 
-        const token = req.headers.authorization;
-        res.set('Location', `/api/admin/transactions/${idTransaction}`)
-        res.set('Authorization', token);
-        return res.status(303).end();
+        return analysis;
+
+        // const token = req.headers.authorization;
+        // res.set('Location', `/api/admin/transactions/${idTransaction}`)
+        // res.set('Authorization', token);
+        // return res.status(303).end();
       }
 
       return res.status(201).json({ _id: response._id, status });
@@ -63,24 +64,29 @@ class TransactionsController {
     }
   };
 
-  static getTransactionById = (req, res) => {
+  static getTransactionById = async (req, res) => {
     const { id } = req.params;
 
-    Transaction.findById(id, (err, transaction) => {
+    Transaction.findById(id, async (err, transaction) => {
       if (err) {
         return res.status(500).send({ message: err.message });
       }
       if (!transaction) {
         return res.status(404).json({ message: 'ID not found' });
       }
+
       let responseBody = {
         _id: transaction._id,
-        valor: transaction._id,
+        valor: transaction.valor,
         idUser: transaction.idUser,
         status: transaction.status,
       };
 
       if (transaction.status === 'Em análise') {
+        // const analysisId = await getAnalysisId(res, transaction._id);
+        // if (typeof analysisId !== 'string') {
+        //   return;
+        // };
         responseBody._links = {
           "self": {
             method: 'GET',

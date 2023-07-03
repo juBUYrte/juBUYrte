@@ -16,17 +16,18 @@ const createAnalysis = async (res, transaction) => {
       headers: { 'Content-Type': 'application/json', 'Authorization': tokenAntiFraude }
     }
   );
+
   const responseAnalise = await data.json();
 
   if (responseAnalise.message) {
     return res.status(data.status).json(responseAnalise)
   }
 
-  return 'OK';
+  return responseAnalise;
 }
 
 const getClientId = async (res, dadosDoCartao, tokenClient) => {
-  const dataCartao = await fetch('http://localhost:3001/api/admin/users/cards', {
+  const dataCartao = await fetch('http://localhost:8080/clientes/api/admin/users/cards', {
     method: 'post',
     body: JSON.stringify(dadosDoCartao),
     headers: { 'Content-Type': 'application/json', 'Authorization': tokenClient }
@@ -43,7 +44,7 @@ const getClientId = async (res, dadosDoCartao, tokenClient) => {
 }
 
 const getClientRent = async (res, idUser, tokenClient) => {
-  const dataRent = await fetch(`http://localhost:3001/api/admin/users/cards/${idUser}`, {
+  const dataRent = await fetch(`http://localhost:8080/clientes/api/admin/users/cards/${idUser}`, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': tokenClient
@@ -60,4 +61,27 @@ const getClientRent = async (res, idUser, tokenClient) => {
   return rent;
 }
 
-export { createAnalysis, getClientId, getClientRent };
+const getAnalysisId = async (res, transactionId) => {
+  const tokenAntiFraude = await createToken(3000);
+  const formatedTransactionId = transactionId.toString();
+
+  const data = await fetch('http://localhost:3000/api/admin/analysis', {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': tokenAntiFraude
+    }
+  });
+
+  const response = await data.json();
+  const filter = response.find(item => item.transactionId == formatedTransactionId);
+  console.log('filter? ', filter);
+  console.log('response? ', response);
+  console.log('formatedTransactionId? ', formatedTransactionId);
+
+  if (response.message) {
+    return res.status(data.status).json(response);
+  }
+  return response.id;
+}
+
+export { createAnalysis, getClientId, getClientRent, getAnalysisId };
