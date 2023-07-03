@@ -40,13 +40,24 @@ Nos asseguramos de garantir dados válidos e confiáveis dos cartões de crédit
 
 Os dados do cartão foram criptografados para garantir a segurança dos clientes. Utilizamos a biblioteca `ncryptJS`.
 
+✨ Esse microsserviço tem testes para cobrir 100% das funções.
+
 <br>
 
 ## Transações
+O usuário utiliza o fluxo de criar uma transação onde são enviados os dados do cartão junto com o valor da transação para serem verificados no microsserviço de Clientes. Após verificar a validação desses dados, caso a renda do usuário seja maior ou igual à 50% da renda do cliente, essa transação precisará ser analisada pelo microsserviço de Antifraude e estará 'Em análise', caso o contrário a transação receberá o status 'Aprovada' ou 'Rejeitada'.
 
 ## AntiFraude
+Agindo como um complemento de segurança ao fluxo de Transações, o microsserviço de Antifraude traz uma forma de capturar transações que não são óbvias de serem naturais e enviar para uma análise humana, resultando em uma aprovação ou rejeição. 
 
-## Testes
+Aqui, o foco é garantir que as análises serão corretamente aprovadas ou rejeitadas.
+
+✨ Esse microsserviço tem testes para cobrir 100% das funções.
+
+## Api-Gateway
+O porteiro das nossas requisições gerencia as várias APIs e microsserviços que nosso projeto possui além de estabelecer um limite na quantidade de requisições que podem ser feitas em determinado período de tempo. Construído utilizando `nginx´.
+
+Inicialmente começamos com a taxa de duas requisições por minuto, mas por ser uma taxa extremamente agressiva optamos por manter em trinta requisições por minuto.
 
 <br><br>
 ### Créditos
