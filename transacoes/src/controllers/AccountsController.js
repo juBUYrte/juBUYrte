@@ -1,7 +1,6 @@
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import passport from 'passport';
-import fetch from "node-fetch";
 
 import Account from '../models/Account.js';
 import goToken from '../authentication/auth.js';
@@ -14,7 +13,7 @@ class AccountController {
         return next(err);
       }
       if (!user) {
-        res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: 'User not found' });
       }
       const token = goToken(user._id);
       return res.status(204).header('Authorization', `Bearer ${token}`).send();
@@ -60,32 +59,6 @@ class AccountController {
       senha: hashSenha,
       createdDate: Date(),
     });
-
-    await fetch(
-      'http://anti-fraude:3000/api/admin/accounts',
-      {
-        method: 'post',
-        body: JSON.stringify({
-          nome,
-          email,
-          senha: hashSenha,
-        }),
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
-
-    await fetch(
-      'http://clientes:3001/api/admin/accounts',
-      {
-        method: 'post',
-        body: JSON.stringify({
-          nome,
-          email,
-          senha: hashSenha,
-        }),
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
 
     try {
       await account.save();

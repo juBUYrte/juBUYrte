@@ -3,6 +3,10 @@ import Transaction from '../models/Transaction.js';
 import createToken from '../../solutions/token.js';
 import { createAnalysis, getClientId, getClientRent } from '../services/TransactionsServices.js';
 
+const HOSTNAME = process.env.TRANSACOES_HOSTNAME || 'localhost';
+const PORT = process.env.TRANSACOES_PORT || '3000';
+const URL = `http://${HOSTNAME}:${PORT}/api/admin`;
+
 class TransactionsController {
   static getAllTransactions = (_, res) => {
     Transaction.find((err, transactions) => {
@@ -38,12 +42,11 @@ class TransactionsController {
       const transaction = new Transaction({ valor, idUser, status });
       const response = await transaction.save();
 
-
       if (status === 'Em análise') {
         const idTransaction = response._id.toString();
         const analysis = await createAnalysis(res, response);
 
-        if (typeof analysis !== 'string') {
+        if (!analysis._id) {
           return;
         }
 
@@ -59,17 +62,45 @@ class TransactionsController {
     }
   };
 
-  static getTransactionById = (req, res) => {
+  static getTransactionById = async (req, res) => {
     const { id } = req.params;
 
-    Transaction.findById(id, (err, transaction) => {
+    Transaction.findById(id, async (err, transaction) => {
       if (err) {
         return res.status(500).send({ message: err.message });
       }
       if (!transaction) {
         return res.status(404).json({ message: 'ID not found' });
       }
-      return res.status(200).json(transaction);
+
+      let responseBody = {
+        _id: transaction._id,
+        valor: transaction.valor,
+        idUser: transaction.idUser,
+        status: transaction.status,
+      };
+
+      if (transaction.status === 'Em análise') {
+        responseBody._links = {
+          "self": {
+            method: 'GET',
+            href: `${URL}/analysis/${transaction._id}`,
+          },
+          "Aprovar": {
+            method: 'PATCH',
+            obs: 'O método deve ser chamado pela API anti-fraude',
+            href: `${URL}/analysis/${transaction._id}`,
+            body: { status: 'Aprovada' }
+          },
+          "Rejeitar": {
+            method: 'PATCH',
+            obs: 'O método deve ser chamado pela API anti-fraude',
+            href: `${URL}/analysis/${transaction._id}`,
+            body: { status: 'Rejeitada' }
+          }
+        };
+      }
+      return res.status(200).json(responseBody);
     });
   };
 

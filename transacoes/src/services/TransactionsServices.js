@@ -16,13 +16,14 @@ const createAnalysis = async (res, transaction) => {
       headers: { 'Content-Type': 'application/json', 'Authorization': tokenAntiFraude }
     }
   );
+
   const responseAnalise = await data.json();
 
   if (responseAnalise.message) {
     return res.status(data.status).json(responseAnalise)
   }
 
-  return 'OK';
+  return responseAnalise;
 }
 
 const getClientId = async (res, dadosDoCartao, tokenClient) => {

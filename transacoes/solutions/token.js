@@ -32,10 +32,6 @@ const createToken = async (port, host) => {
 
   let token = response.headers.get('authorization');
 
-  if (!token) {
-    const body = await response.json();
-    token = `Bearer ${body.token}`;
-  }
   return token;
 };
 export default createToken;
