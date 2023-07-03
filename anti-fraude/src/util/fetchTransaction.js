@@ -1,5 +1,5 @@
 import axios from 'axios';
-import TokenGenerator from './tokenGenerator';
+import TokenGenerator from './tokenGenerator.js';
 
 const TRANSACTION_HOSTNAME = 'localhost';
 const TRANSACTION_PORT = '3002';
@@ -13,7 +13,7 @@ const updateTransaction = async (transactionId, status) => {
       Authorization: `Bearer ${token}`,
     },
   };
-  
+
   try {
     const url = `${TRANSACTION_URL}/${transactionId}`;
     const dataBody = { status };

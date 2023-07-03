@@ -1,5 +1,5 @@
 import axios from 'axios';
-import TokenGenerator from './tokenGenerator';
+import TokenGenerator from './tokenGenerator.js';
 
 const CLIENTS_HOSTNAME = 'localhost';
 const CLIENTS_PORT = '3001';
