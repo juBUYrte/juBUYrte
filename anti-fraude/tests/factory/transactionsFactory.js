@@ -8,7 +8,7 @@ const TRANSACTION_HOSTNAME = 'localhost';
 const TRANSACTION_PORT = '3002';
 const TRANSACTION_URL = `http://${TRANSACTION_HOSTNAME}:${TRANSACTION_PORT}`;
 
-export default async function createUserAndTransaction() {
+export default async function createUserAndTransaction(email = 'teste.email@email.com') {
   const token = await TokenGenerator.clients();
 
   const config = {
@@ -17,7 +17,7 @@ export default async function createUserAndTransaction() {
     },
   };
 
-  const newUser = await createNewCliente();
+  const newUser = await createNewCliente(email);
   const validTransactionData = {
     dadosDoCartao: {
       numero: '123456789101234',

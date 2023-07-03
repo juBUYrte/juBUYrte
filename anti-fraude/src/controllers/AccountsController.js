@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -41,6 +42,10 @@ class AccountController {
       return res.status(409).send({ message: 'Email already exists' });
     }
 
+    if (!req.body.senha) {
+      return res.status(422).send({ message: 'A senha é um campo obrigatório. Favor refazer a operação.' });
+    }
+
     const salt = 12;
     const passwordHash = await bcrypt.hashSync(req.body.senha, salt);
 
@@ -54,6 +59,9 @@ class AccountController {
       await account.save();
       return res.status(201).set('Location', `/admin/accounts/${account.id}`).send(account);
     } catch (error) {
+      if (error.name === 'ValidationError') {
+        return res.status(422).send({ message: error.message });
+      }
       return res.status(500).send({ message: error.message });
     }
   };
@@ -78,8 +86,14 @@ class AccountController {
     return res.status(204).header('Authorization', `Bearer ${token}`).send();
   };
 
-  static updateAccount = (req, res) => {
+  static updateAccount = async (req, res) => {
     const { id } = req.params;
+
+    const hasUser = await Account.findById(id);
+
+    if (!hasUser) {
+      return res.status(404).send({ message: 'Não há usuário cadastrado com o Id informado.' });
+    }
 
     Account.findByIdAndUpdate(id, { $set: req.body }, { new: true }, (err, account) => {
       if (err) {
@@ -89,8 +103,14 @@ class AccountController {
     });
   };
 
-  static deleteAccount = (req, res) => {
+  static deleteAccount = async (req, res) => {
     const { id } = req.params;
+
+    const hasUser = await Account.findById(id);
+
+    if (!hasUser) {
+      return res.status(404).send({ message: 'Não há usuário cadastrado com o Id informado.' });
+    }
 
     Account.findByIdAndDelete(id, (err) => {
       if (err) {

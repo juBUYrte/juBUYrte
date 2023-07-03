@@ -123,7 +123,6 @@ class AnalysisController {
       if (error.name === 'CastError') {
         return res.status(422).send({ message: 'O id informado é inválido, favor informe um id compatível com o tipo ObjectID' });
       }
-      console.log(error);
       return res.status(500).send({ message: error.message });
     }
   };

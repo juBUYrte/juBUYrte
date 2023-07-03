@@ -19,33 +19,6 @@ const buscaId = async (id) => {
 
 export default function inicializarPassport() {
   passport.use(
-    new LocalStrategy(
-      {
-        usernameField: 'email',
-        passwordField: 'senha',
-        session: 'false',
-      },
-
-      async (email, senha, done) => {
-        try {
-          const account = await Account.findOne({ email });
-          if (!account) {
-            return done(null, false, { message: 'Dados inválidos' });
-          }
-          const compare = await bcrypt.compare(senha, account.senha);
-          if (!compare) {
-            return done(null, false, { message: 'Dados inválidos' });
-          }
-
-          return done(null, account);
-        } catch (error) {
-          return done(error);
-        }
-      },
-    ),
-  );
-
-  passport.use(
     new BearerStrategy(
       async (token, done) => {
         try {

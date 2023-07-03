@@ -1,8 +1,9 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-underscore-dangle */
-import request from 'supertest';
+import supertest from 'supertest';
 import app from '../../src/app.js';
-import createNewAccount from '../factory/accountsFactory.js';
+import Account from '../../src/models/Account.js';
+import { createNewAccount, createNewHashedAccount } from '../factory/accountsFactory.js';
 import { createValidToken } from '../utils.js';
 
 let server;
@@ -23,55 +24,19 @@ afterAll(async () => {
   await server.close();
 });
 
-describe('Testes da rota de DELETE /api/admin/accounts/:id', () => {
-  it('A rota deve retornar um status 204', async () => {
-    const newObject = {
-      nome: 'usuario teste DELETE',
-      email: 'usuarioTesteDelet@mail.com',
-      senha: '1234',
-    };
+const request = supertest(app);
 
-    const resp = await request(app).post('/api/admin/accounts').send(newObject).expect(201);
-    const { _id } = resp.body;
+describe('GET /', () => {
+  it('A rota deve retornar um status 200', async () => {
+    const response = await request.get('/');
 
-    await request(app)
-      .delete(`/api/admin/accounts/${_id}`)
-      .set({ Authorization: `Bearer ${validToken}` })
-      .expect(204);
-  });
-  it('A rota deve deletar um usuario', async () => {
-    const newObject = {
-      nome: 'usuario teste DELETE',
-      email: 'usuarioTesteDelete8@mail.com',
-      senha: '1234',
-    };
-
-    const resp = await request(app).post('/api/admin/accounts').send(newObject).expect(201);
-    const { _id } = resp.body;
-    await request(app)
-      .delete(`/api/admin/accounts/${_id}`)
-      .set({ Authorization: `Bearer ${validToken}` })
-      .expect(204);
-  });
-
-  it('A rota deve retornar um status 404 para um ID invalido', async () => {
-    const id = '649aeba13013a8524787b1a';
-    await request(app)
-      .delete(`/api/admin/accounts/${id}`)
-      .set({ Authorization: `Bearer ${validToken}` })
-      .expect(404);
-  });
-  it('A rota deve retornar um status 401 ao não passar token de acesso', async () => {
-    const id = '649aeba13013a8524777b1a';
-    await request(app)
-      .delete(`/api/admin/accounts/${id}`)
-      .expect(401);
+    expect(response.status).toBe(200);
   });
 });
 
-describe('Testes da rota de GET /api/admin/accounts', () => {
+describe('GET /api/admin/accounts', () => {
   it('A rota deve retornar um status 200', async () => {
-    await request(app)
+    await request
       .get('/api/admin/accounts')
       .set('Accept', 'application/json')
       .set({ Authorization: `Bearer ${validToken}` })
@@ -79,7 +44,7 @@ describe('Testes da rota de GET /api/admin/accounts', () => {
       .expect(200);
   });
   it('A rota deve retornar um array de objetos', async () => {
-    const req = await request(app).get('/api/admin/accounts')
+    const req = await request.get('/api/admin/accounts')
       .set({ Authorization: `Bearer ${validToken}` });
     // a resposta deve ser um array
     expect(Array.isArray(req.body)).toBe(true);
@@ -88,7 +53,7 @@ describe('Testes da rota de GET /api/admin/accounts', () => {
     });
   });
   it('Os objetos devem conter as chaves requeridas', async () => {
-    const req = await request(app).get('/api/admin/accounts')
+    const req = await request.get('/api/admin/accounts')
       .set({ Authorization: `Bearer ${validToken}` });
 
     const objetoTest = {
@@ -102,88 +67,188 @@ describe('Testes da rota de GET /api/admin/accounts', () => {
     });
   });
   it('A rota deve retornar um status 401 ao não passar token de acesso', async () => {
-    await request(app)
+    await request
       .get('/api/admin/accounts')
       .expect(401);
   });
 });
 
-describe('Testes da rota de GET /api/admin/accounts/:id', () => {
+describe('GET /api/admin/accounts/:id', () => {
   it('A rota deve retornar um status 200', async () => {
-    const resp = await request(app).get('/api/admin/accounts')
+    const response = await request.get(`/api/admin/accounts/${newAccount._id.toHexString()}`)
       .set({ Authorization: `Bearer ${validToken}` });
-    const { _id } = resp.body[0];
 
-    await request(app)
-      .get(`/api/admin/accounts/${_id}`)
-      .set('Accept', 'application/json')
-      .set({ Authorization: `Bearer ${validToken}` })
-      .expect('content-type', /json/)
-      .expect(200);
+    expect(response.status).toBe(200);
   });
   it('A rota deve retornar um usuário, por ID', async () => {
-    const resp = await request(app).get('/api/admin/accounts')
+    const response = await request.get(`/api/admin/accounts/${newAccount._id.toHexString()}`)
       .set({ Authorization: `Bearer ${validToken}` });
-    const {
-      _id, email, senha,
-    } = resp.body[0];
 
-    const respId = await request(app).get(`/api/admin/accounts/${_id}`)
-      .set({ Authorization: `Bearer ${validToken}` });
-    expect(respId.body).toHaveProperty('_id');
-    expect(respId.body).toHaveProperty('nome');
-    expect(respId.body.email).toBe(email);
-    expect(respId.body.senha).toBe(senha);
+    expect(response.body).toEqual(expect.objectContaining({
+      _id: newAccount._id.toHexString(),
+      nome: newAccount.nome,
+      email: newAccount.email,
+      senha: newAccount.senha,
+    }));
   });
   it('A rota deve retornar um status 404 ao não passar Id invalido', async () => {
-    await request(app)
+    await request
       .get('/api/admin/accounts/649c3d4f67d28be127782a60')
       .set({ Authorization: `Bearer ${validToken}` })
       .expect(404);
   });
   it('A rota deve retornar um status 401 ao  passar token de acesso', async () => {
-    await request(app)
+    await request
       .get('/api/admin/accounts/649c3d4f67d28be127782a60')
       .expect(401);
   });
 });
 
-describe('Testes da rota de PUT /api/admin/accounts/:id', () => {
+describe('POST /api/admin/accounts', () => {
+  it('deve retornar status 409, quando um usuário fornecer um e-mail já utilizado', async () => {
+    const emailParameter = 'email.utilizado@teste.com';
+    await createNewAccount(emailParameter);
+    const body = {
+      nome: 'teste',
+      email: emailParameter,
+      senha: 'teste',
+    };
+    const response = await request.post('/api/admin/accounts').send(body);
+
+    expect(response.status).toBe(409);
+  });
+
+  it.each([
+    ['sem o campo nome', { senha: '123456', email: 'teste1@testando.com.br' }],
+    ['sem o campo senha', { nome: 'Teste', email: 'teste2@testando.com.br' }],
+    ['sem o campo email', { senha: '123456', nome: 'Teste' }],
+  ])('deve retornar status 422, quando um usuário fornecer um body inválido. (%s)', async (title, mock) => {
+    const response = await request.post('/api/admin/accounts').send(mock);
+
+    expect(response.status).toBe(422);
+  });
+
+  it('A rota deve retornar um status 201, em casos de sucesso, e salvar a senha criptografada.', async () => {
+    const body = {
+      nome: 'teste',
+      email: 'teste@mail.org.br',
+      senha: 'teste',
+    };
+    const response = await request.post('/api/admin/accounts').send(body);
+
+    await Account.deleteOne({ email: 'teste@mail.org.br' });
+    expect(response.status).toBe(201);
+    expect(response.body._id).toBeDefined();
+    expect(response.body.senha !== body.senha).toBe(true);
+  });
+});
+
+describe('POST /api/accounts/login', () => {
+  it.each([
+    ['senha inválida', { email: 'sss', senha: 'senha_inválida' }],
+    ['email inválido', { email: 'email.invalido@testando.com.br', senha: 'sss' }],
+  ])('deve retornar status 401, quando um usuário fornecer %s.', async (title, mock) => {
+    const response = await request.post('/api/accounts/login').send(mock);
+
+    expect(response.status).toBe(401);
+  });
+
+  it('A rota deve retornar um status 204, em caso de sucesso de login.', async () => {
+    const emailParameter = 'teste.login@teste.com';
+    const passwordParameter = 'teste_senha';
+    await createNewHashedAccount(emailParameter, passwordParameter);
+    const body = {
+      email: emailParameter,
+      senha: passwordParameter,
+    };
+
+    const response = await request.post('/api/accounts/login').send(body);
+    expect(response.status).toBe(204);
+  });
+
+  it('A rota deve retornar o token gerado no headers', async () => {
+    const emailParameter = 'teste.headers@teste.com';
+    const passwordParameter = 'teste_senha';
+    await createNewHashedAccount(emailParameter, passwordParameter);
+    const body = {
+      email: emailParameter,
+      senha: passwordParameter,
+    };
+
+    const response = await request.post('/api/accounts/login').send(body);
+    expect(response.headers.authorization).toBeDefined();
+  });
+});
+
+describe('PUT /api/admin/accounts/:id', () => {
+  it('A rota deve retornar um status 204 e atualizar os dados do usuário no banco', async () => {
+    const newUser = await createNewAccount('atualizado204@mail.com');
+
+    const response = await request.put(`/api/admin/accounts/${newUser._id.toHexString()}`)
+      .set({ Authorization: `Bearer ${validToken}` }).send({ nome: 'Nome atualizado' });
+
+    const updatedUser = await Account.findById(newUser._id.toHexString());
+
+    expect(updatedUser.nome).toBe('Nome atualizado');
+    expect(response.status).toBe(204);
+  });
+
+  it('A rota deve retornar um status 404 para um ID inexistente', async () => {
+    const response = await request.put('/api/admin/accounts/649c3d4f67d28be127782a60')
+      .set({ Authorization: `Bearer ${validToken}` }).send({ nome: 'Nome atualizado' });
+
+    expect(response.status).toBe(404);
+  });
+
+  it('A rota deve retornar um status 401 ao não passar token de acesso', async () => {
+    await request
+      .put('/api/admin/accounts/649c3d4f67d28be127782a60')
+      .expect(401);
+  });
+});
+
+describe('DELETE /api/admin/accounts/:id', () => {
   it('A rota deve retornar um status 204', async () => {
-    const resp = await request(app).get('/api/admin/accounts')
-      .set({ Authorization: `Bearer ${validToken}` });
-    const { _id } = resp.body[0];
-    await request(app)
-      .put(`/api/admin/accounts/${_id}`)
+    const newObject = {
+      nome: 'usuario teste DELETE',
+      email: 'usuarioTesteDeleted@mail.com',
+      senha: '1234',
+    };
+
+    const resp = await request.post('/api/admin/accounts').send(newObject).expect(201);
+    const { _id } = resp.body;
+
+    await request
+      .delete(`/api/admin/accounts/${_id}`)
       .set({ Authorization: `Bearer ${validToken}` })
-      .send({
-        nome: 'NOME DO USUARIO ATUALIZADO5asdas',
-      })
       .expect(204);
   });
-  it('A rota deve atualizar um usuario', async () => {
-    const resp = await request(app).get('/api/admin/accounts')
-      .set({ Authorization: `Bearer ${validToken}` });
-    const { _id } = resp.body[0];
-    const atualizandoObjeto = await request(app)
-      .put(`/api/admin/accounts/${_id}`)
+  it('A rota deve deletar um usuario', async () => {
+    const newObject = {
+      nome: 'usuario teste DELETE',
+      email: 'usuarioTesteDelete@mail.com',
+      senha: '1234',
+    };
+
+    const resp = await request.post('/api/admin/accounts').send(newObject).expect(201);
+    const { _id } = resp.body;
+    await request
+      .delete(`/api/admin/accounts/${_id}`)
       .set({ Authorization: `Bearer ${validToken}` })
-      .send({
-        nome: 'NOME DO USUARIO ATUALIZADO',
-      })
       .expect(204);
-    expect(atualizandoObjeto.statusCode).toBe(204);
   });
+
   it('A rota deve retornar um status 404 para um ID invalido', async () => {
     const id = '649c3d4f67d28be127782a60';
-    await request(app)
-      .put(`/api/admin/accounts/${id}`)
+    await request
+      .delete(`/api/admin/accounts/${id}`)
       .set({ Authorization: `Bearer ${validToken}` })
       .expect(404);
   });
   it('A rota deve retornar um status 401 ao não passar token de acesso', async () => {
-    await request(app)
-      .put('/api/admin/accounts/649c3d4f67d28be127782a60')
+    const id = '649aeba13013a8524777b1a';
+    await request
+      .delete(`/api/admin/accounts/${id}`)
       .expect(401);
   });
 });

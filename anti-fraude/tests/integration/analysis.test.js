@@ -1,8 +1,10 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-undef */
+import axios from 'axios';
 import supertest from 'supertest';
 import app from '../../src/app.js';
-import createNewAccount from '../factory/accountsFactory.js';
+import Analysis from '../../src/models/Analysis.js';
+import { createNewAccount } from '../factory/accountsFactory.js';
 import { createRejectedAndApprovedAnalysis, createSimpleAnalysis, createUnderReviewAnalysis } from '../factory/analysisFactory.js';
 import createUserAndTransaction from '../factory/transactionsFactory.js';
 import {
@@ -397,56 +399,44 @@ describe('PATCH api/admin/analysis/:id - Atualização de status de análise)', 
     //   const status = {
     //     status: 'Aprovada',
     //   };
-    //
 
-    //   const clientId = userAndTransactionGenerator.newUser.data._id;
-    //   const transactionId = userAndTransactionGenerator.newTransaction.data._id;
+    //   const newUserAndTransaction = await createUserAndTransaction('test.patch2@mail.com');
+
+    //   const clientId = newUserAndTransaction.newUser.data._id;
+    //   const transactionId = newUserAndTransaction.newTransaction.data._id;
 
     //   const analysis = await createSimpleAnalysis(clientId, transactionId);
 
     //   const response = await request.patch(`/api/admin/analysis/${analysis._id.toHexString()}`).set('Authorization', `Bearer ${validToken}`).send(status);
+    //   console.log(response);
 
     //   expect(response.status).toBe(204);
+    //   await deleteCreatedClient(newUserAndTransaction.newUser.data._id);
+    //   await deleteCreatedTransaction(newUserAndTransaction.newTransaction.data._id);
     // });
 
-    // it.each([
-    //   ['"Aprovada"', 'Aprovada'],
-    //   ['"Rejeitada"', 'Rejeitada'],
-    // ]).it('deverá atualizar o status da análise, no db de anti-fraude, em caso de sucesso na requisição. (status = %s)', async (title, mock) => {
-    //   const status = {
-    //     status: mock,
-    //   };
-    //
+    it.each([
+      ['"Aprovada"', 'Aprovada'],
+      ['"Rejeitada"', 'Rejeitada'],
+    ])('deverá atualizar o status da análise, no db de anti-fraude, em caso de sucesso na requisição. (status = %s)', async (title, mock) => {
+      const status = {
+        status: mock,
+      };
 
-    //   const clientId = userAndTransactionGenerator.newUser.data._id;
-    //   const transactionId = userAndTransactionGenerator.newTransaction.data._id;
+      const newUserAndTransaction = await createUserAndTransaction('test_patch@mail.com');
 
-    //   const analysis = await createSimpleAnalysis(clientId, transactionId);
+      const clientId = newUserAndTransaction.newUser.data._id;
+      const transactionId = newUserAndTransaction.newTransaction.data._id;
 
-    //   await request.patch(`/api/admin/analysis/${analysis._id.toHexString()}`).set('Authorization', `Bearer ${validToken}`).send(status);
+      const analysis = await createSimpleAnalysis(clientId, transactionId);
 
-    //   const updatedAnalysis = await Analysis.findById(analysis._id);
-    //   expect(updatedAnalysis.status).toBe(mock);
-    // });
+      await request.patch(`/api/admin/analysis/${analysis._id.toHexString()}`).set('Authorization', `Bearer ${validToken}`).send(status);
 
-    // it.each([
-    //   ['"Aprovada"', 'Aprovada'],
-    //   ['"Rejeitada"', 'Rejeitada'],
-    // ]).it('deverá atualizar o status da transação, no db de transações, em caso de sucesso na requisição. (status = %s)', async (title, mock) => {
-    //   const status = {
-    //     status: mock,
-    //   };
-    //
+      const updatedAnalysis = await Analysis.findById(analysis._id);
+      expect(updatedAnalysis.status).toBe(mock);
 
-    //   const clientId = userAndTransactionGenerator.newUser.data._id;
-    //   const transactionId = userAndTransactionGenerator.newTransaction.data._id;
-
-    //   const analysis = await createSimpleAnalysis(clientId, transactionId);
-
-    //   await request.patch(`/api/admin/analysis/${analysis._id.toHexString()}`).set('Authorization', `Bearer ${validToken}`).send(status);
-
-    //   const updatedTransaction = await axios.get(`http://localhost:3002/api/admin/transactions/${transactionId}`);
-    //   expect(updatedTransaction.data.status).toBe(mock);
-    // });
+      await deleteCreatedClient(newUserAndTransaction.newUser.data._id);
+      await deleteCreatedTransaction(newUserAndTransaction.newTransaction.data._id);
+    });
   });
 });

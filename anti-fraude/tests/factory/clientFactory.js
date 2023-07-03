@@ -6,7 +6,7 @@ const CLIENTS_HOSTNAME = 'localhost';
 const CLIENTS_PORT = '3001';
 const CLIENTS_URL = `http://${CLIENTS_HOSTNAME}:${CLIENTS_PORT}`;
 
-export default async function createNewCliente() {
+export default async function createNewCliente(email = 'teste.email@email.com') {
   const token = await TokenGenerator.clients();
 
   const config = {
@@ -18,7 +18,7 @@ export default async function createNewCliente() {
   const clientData = {
     nome: 'Joao Teste',
     cpf: '12345677910',
-    email: 'email.teste@gmail.com',
+    email,
     telefone: '8399959999',
     rendaMensal: '14800',
     endereço: {

@@ -73,7 +73,7 @@ class CardController {
       return res.status(200).json({ rent: resp.rendaMensal });
     } catch (err) {
       if (err.name === 'CastError') {
-        return res.status(400).json({ message: 'Not found' });
+        return res.status(404).json({ message: 'Not found' });
       }
       return res.status(500).json(err);
     }
