@@ -1,7 +1,7 @@
 import Transaction from '../models/Transaction.js';
 
 import createToken from '../../solutions/token.js';
-import { createAnalysis, getClientId, getClientRent, getAnalysisId } from '../services/TransactionsServices.js';
+import { createAnalysis, getClientId, getClientRent } from '../services/TransactionsServices.js';
 
 const HOSTNAME = process.env.TRANSACOES_HOSTNAME || 'localhost';
 const PORT = process.env.TRANSACOES_PORT || '3000';
