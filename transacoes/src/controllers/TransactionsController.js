@@ -17,7 +17,7 @@ class TransactionsController {
     const { valor, dadosDoCartao } = req.body;
 
     try {
-      const tokenClient = await createToken(3001);
+      const tokenClient = await createToken(3001, "clientes");
       if (typeof tokenClient !== 'string') {
         return;
       }

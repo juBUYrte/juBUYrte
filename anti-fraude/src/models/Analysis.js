@@ -3,11 +3,11 @@ import axios from 'axios';
 import mongoose from 'mongoose';
 import TokenGenerator from '../util/tokenGenerator.js';
 
-const CLIENTS_HOSTNAME = 'localhost';
+const CLIENTS_HOSTNAME = 'clientes';
 const CLIENTS_PORT = '3001';
 const CLIENTS_URL = `http://${CLIENTS_HOSTNAME}:${CLIENTS_PORT}/api/admin/users`;
 
-const TRANSACTION_HOSTNAME = 'localhost';
+const TRANSACTION_HOSTNAME = 'transacoes';
 const TRANSACTION_PORT = '3002';
 const TRANSACTION_URL = `http://${TRANSACTION_HOSTNAME}:${TRANSACTION_PORT}/api/admin/transactions`;
 

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import passport from 'passport';
+import fetch from "node-fetch";
 
 import Account from '../models/Account.js';
 import goToken from '../authentication/auth.js';
@@ -61,7 +62,7 @@ class AccountController {
     });
 
     await fetch(
-      'http://localhost:3000/api/admin/accounts',
+      'http://anti-fraude:3000/api/admin/accounts',
       {
         method: 'post',
         body: JSON.stringify({
@@ -74,7 +75,7 @@ class AccountController {
     );
 
     await fetch(
-      'http://localhost:3001/api/admin/accounts',
+      'http://clientes:3001/api/admin/accounts',
       {
         method: 'post',
         body: JSON.stringify({

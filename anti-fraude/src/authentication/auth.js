@@ -1,9 +1,7 @@
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import passport from 'passport';
 import { Strategy as BearerStrategy } from 'passport-http-bearer';
-import { Strategy as LocalStrategy } from 'passport-local';
 import Account from '../models/Account.js';
 
 dotenv.config();

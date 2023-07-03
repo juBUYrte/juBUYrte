@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-const createToken = async (port) => {
+const createToken = async (port, host) => {
   const admin = {
     nome: 'admin',
     email: 'admin@mail.com',
@@ -13,7 +13,7 @@ const createToken = async (port) => {
   };
 
   await fetch(
-    `http://localhost:${port}/api/admin/accounts`,
+    `http://${host}:${port}/api/admin/accounts`,
     {
       method: 'post',
       body: JSON.stringify(admin),
@@ -22,7 +22,7 @@ const createToken = async (port) => {
   );
 
   const response = await fetch(
-    `http://localhost:${port}/api/accounts/login`,
+    `http://${host}:${port}/api/accounts/login`,
     {
       method: 'post',
       body: JSON.stringify(login),
