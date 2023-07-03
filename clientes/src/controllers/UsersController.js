@@ -1,18 +1,18 @@
 import Users from '../models/User.js';
+import { encrypt } from '../cripto/index.js';
 
-// const cartaoTest = {
-//   numero: '1234432156788765',
-//   nome: 'carol fake',
-//   validade: '12/30',
-//   codigo: '789',
-//   vencimento: '12',
-// };
-
-// const startCript = (dados) => {
-//   const keysCart = Object.keys(dados);
-//   const valuesCart = Object.values(dados);
-// // };
-// startCript(cartaoTest);
+const dadosCriptografados = (dados) => {
+  const dadosCartaoKeys = Object.keys(dados);
+  const dadosCartaoValues = Object.values(dados);
+  const objetoCripto = {};
+  dadosCartaoValues.forEach((value, index) => {
+    const chave = dadosCartaoKeys[index];
+    const encripted = encrypt(value);
+    objetoCripto[chave] = encripted;
+    objetoCripto._nxt = true;
+  });
+  return objetoCripto;
+};
 
 class UserController {
   static getAll = async (_req, res) => {
@@ -39,21 +39,25 @@ class UserController {
 
   static async createUser(req, res) {
     try {
+      const dadosCartao = dadosCriptografados(req.body.dadosDoCartao);
+
+      req.body.dadosDoCartao = dadosCartao;
       const newUser = new Users(req.body);
 
       await newUser.save();
-      res.status(201).json(newUser);
+      return res.status(201).json(newUser);
     } catch (err) {
-      console.log(err.name);
       if (err.name == 'ValidationError') {
         return res.status(409).json(err);
       }
       if (err.name == 'MongoServerError') {
         return res.status(409).json(err);
       }
+      if (err.name == 'TypeError') {
+        return res.status(409).json(err);
+      }
       return res.status(500).json(err);
     }
-    return '';
   }
 
   static deleteById = async (req, res) => {

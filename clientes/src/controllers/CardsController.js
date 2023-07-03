@@ -1,3 +1,4 @@
+import { decrypt } from '../cripto/index.js';
 import Users from '../models/User.js';
 
 const validaCard = (dadosUser, dadosBody) => {
@@ -29,16 +30,39 @@ const validaCard = (dadosUser, dadosBody) => {
   return false;
 };
 
+const dadosDesCriptografados = (dados) => {
+  const dadosCartaoKeys = Object.keys(dados);
+  const dadosCartaoValues = Object.values(dados);
+
+  const dadosCartaoKeysSemNxt = dadosCartaoKeys.filter((key) => key !== '_nxt' && key !== 'vencimento');
+
+  const objetoCripto = {};
+
+  dadosCartaoKeysSemNxt.forEach((key, index) => {
+    const value = dadosCartaoValues[index];
+    objetoCripto[key] = decrypt(value);
+    objetoCripto._nxt = 'true';
+  });
+  return objetoCripto;
+};
+
 class CardController {
   static validateCard = async (req, res) => {
     try {
-      const dadosDoCartao = req.body;
+      const dadosDoCartaoBody = req.body;
       const users = await Users.find();
       const userFiltered = users.filter(((user) => {
-        if (validaCard(user.dadosDoCartao, dadosDoCartao)) {
+        if (user.dadosDoCartao._nxt) {
+          const iv = dadosDesCriptografados(user.dadosDoCartao);
+          if (validaCard(iv, dadosDoCartaoBody)) {
+            return user;
+          }
+        }
+        if (validaCard(user.dadosDoCartao, dadosDoCartaoBody)) {
           return user;
         }
       }));
+
       if (userFiltered.length === 0) {
         return res.status(400).json({ message: 'Invalid Card' });
       }
