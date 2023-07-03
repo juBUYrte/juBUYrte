@@ -11,9 +11,6 @@ const bearerMiddleware = (req, res, next) => {
       if (error) {
         return res.status(500).json({ message: error.message });
       }
-      if (!usuario) {
-        return res.status(401).json({ message: 'Missing token' });
-      }
 
       req.user = usuario;
       return next();

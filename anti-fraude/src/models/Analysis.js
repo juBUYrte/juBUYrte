@@ -45,7 +45,7 @@ const analysisSchema = new mongoose.Schema(
       validate: {
         async validator(val) {
           try {
-            const token = await TokenGenerator.clients();
+            const token = await TokenGenerator.transactions();
             const config = {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -67,8 +67,8 @@ const analysisSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['Em Análise', 'Aprovada', 'Rejeitada'],
-      default: 'Em Análise',
+      enum: ['Em análise', 'Aprovada', 'Rejeitada'],
+      default: 'Em análise',
     },
   },
 );

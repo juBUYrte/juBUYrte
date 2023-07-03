@@ -9,5 +9,6 @@ router
   .get('/api/admin/transactions/:id', bearerMiddleware, TransactionsController.getTransactionById)
   .patch('/api/admin/transactions/:id', bearerMiddleware, TransactionsController.updateStatusById)
   .get('/api/admin/transactions/', bearerMiddleware, TransactionsController.getAllTransactions)
+  .delete('/api/admin/transactions/:id', bearerMiddleware, TransactionsController.deleteById);
 
 export default router;
