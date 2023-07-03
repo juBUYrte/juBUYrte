@@ -1,7 +1,7 @@
 import axios from 'axios';
 import TokenGenerator from './tokenGenerator.js';
 
-const TRANSACTION_HOSTNAME = 'localhost';
+const TRANSACTION_HOSTNAME = 'transacoes';
 const TRANSACTION_PORT = '3002';
 const TRANSACTION_URL = `http://${TRANSACTION_HOSTNAME}:${TRANSACTION_PORT}/api/admin/transactions`;
 

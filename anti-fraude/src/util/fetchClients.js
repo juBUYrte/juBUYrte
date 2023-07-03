@@ -1,7 +1,7 @@
 import axios from 'axios';
 import TokenGenerator from './tokenGenerator.js';
 
-const CLIENTS_HOSTNAME = 'localhost';
+const CLIENTS_HOSTNAME = 'clientes';
 const CLIENTS_PORT = '3001';
 const CLIENTS_URL = `http://${CLIENTS_HOSTNAME}:${CLIENTS_PORT}/api/admin/users`;
 
