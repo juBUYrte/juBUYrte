@@ -50,6 +50,10 @@ class AccountController {
       return res.status(409).json({ message: 'Email already exists' });
     }
 
+    if (!nome || !email || !senha) {
+      return res.status(422).json({ message: 'Invalid body' });
+    }
+
     const salt = await bcrypt.genSalt(12);
     const hashSenha = await bcrypt.hash(senha, salt);
 

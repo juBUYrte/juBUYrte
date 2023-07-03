@@ -46,15 +46,17 @@ passport.use(
 );
 
 passport.use(
-  new BearerStrategy(async (token, done) => {
-    try {
-      const payload = jwt.verify(token, JWT);
-      const accountUserId = await buscaId(payload.id);
-      return done(null, accountUserId);
-    } catch (error) {
-      return done(error);
-    }
-  }),
+  new BearerStrategy(
+    async (token, done) => {
+      try {
+        const payload = jwt.verify(token, JWT);
+        const accountUserId = await buscaId(payload.id);
+        return done(null, accountUserId);
+      } catch (error) {
+        return done(error);
+      }
+    },
+  ),
 );
 
 const goToken = (id) => {
