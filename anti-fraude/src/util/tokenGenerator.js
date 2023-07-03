@@ -1,11 +1,11 @@
 /* eslint-disable import/no-relative-packages */
 import fetch from 'node-fetch';
 
-const CLIENTS_HOSTNAME = 'localhost';
+const CLIENTS_HOSTNAME = 'clientes';
 const CLIENTS_PORT = '3001';
 const CLIENTS_URL = `http://${CLIENTS_HOSTNAME}:${CLIENTS_PORT}`;
 
-const TRANSACTION_HOSTNAME = 'localhost';
+const TRANSACTION_HOSTNAME = 'transacoes';
 const TRANSACTION_PORT = '3002';
 const TRANSACTION_URL = `http://${TRANSACTION_HOSTNAME}:${TRANSACTION_PORT}`;
 
@@ -42,7 +42,7 @@ export default class TokenGenerator {
   static async transactions() {
     const adminRoleAccount = {
       nome: 'Admin',
-      email: 'admin@admin.com',
+      email: 'admin@mail.com',
       senha: 'admin',
     };
 

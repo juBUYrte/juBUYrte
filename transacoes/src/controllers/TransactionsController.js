@@ -3,7 +3,7 @@ import Transaction from '../models/Transaction.js';
 import createToken from '../../solutions/token.js';
 import { createAnalysis, getClientId, getClientRent, getAnalysisId } from '../services/TransactionsServices.js';
 
-const HOSTNAME = process.env.TRANSACOES_HOSTNAME || 'localhost';
+const HOSTNAME = process.env.TRANSACOES_HOSTNAME || 'anti-fraude';
 const PORT = process.env.TRANSACOES_PORT || '3002';
 const URL = `http://${HOSTNAME}:${PORT}/api/admin`;
 
@@ -21,7 +21,7 @@ class TransactionsController {
     const { valor, dadosDoCartao } = req.body;
 
     try {
-      const tokenClient = await createToken(3001);
+      const tokenClient = await createToken(3001, "clientes");
       if (typeof tokenClient !== 'string') {
         return;
       }
@@ -133,6 +133,19 @@ class TransactionsController {
       });
     });
   }
+
+  static deleteById = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const resp = await Transaction.findByIdAndDelete(id);
+      if (!resp) {
+        res.status(400).json({ message: 'User not found' });
+      }
+      res.status(204).json(resp);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  };
 }
 
 export default TransactionsController;

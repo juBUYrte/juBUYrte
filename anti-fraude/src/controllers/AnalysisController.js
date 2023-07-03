@@ -5,7 +5,7 @@ import Analysis from '../models/Analysis.js';
 import fetchClient from '../util/fetchClients.js';
 import updateTransaction from '../util/fetchTransaction.js';
 
-const HOSTNAME = process.env.ANTI_FRAUDE_HOSTNAME || 'localhost';
+const HOSTNAME = process.env.ANTI_FRAUDE_HOSTNAME || 'anti-fraude';
 const PORT = process.env.ANTI_FRAUDE_PORT || '3000';
 const URL = `http://${HOSTNAME}:${PORT}/api/admin`;
 
@@ -13,8 +13,8 @@ class AnalysisController {
   static _verifyAnalysis = async (id) => {
     const analysis = await Analysis.findById(id);
 
-    if (!analysis) throw NotFoundError('Não há quaisquer produtos com o id informado. Por gentileza, refaça a operação.');
-    if (analysis.status === 'Em Análise' || analysis.status === 'Rejeitada') throw UnauthorizedError('Não é possível deletar uma análise que ainda está sob revisão ou possui status "Rejeitada".');
+    if (!analysis) throw NotFoundError('Não há quaisquer análises com o id informado. Por gentileza, refaça a operação.');
+    if (analysis.status !== 'Aprovada') throw UnauthorizedError('Não é possível deletar uma análise que ainda está sob revisão ou possui status "Rejeitada".');
 
     return analysis;
   };
@@ -28,12 +28,13 @@ class AnalysisController {
 
     await analysis.save((err, newAnalysis) => {
       if (err) {
-        return res.status(500).send({ message: err.message });
+        return res.status(400).send({ message: err.message });
       }
       const newAnalysisResponse = {
         _id: newAnalysis.id,
         clientId: newAnalysis.clientId,
         transactionId: newAnalysis.transactionId,
+        status: 'Em análise',
         _links: {
           self: {
             method: 'GET',
@@ -57,7 +58,7 @@ class AnalysisController {
   };
 
   static findUnderReviewAnalysis = async (_req, res) => {
-    const statusParameter = 'Em Análise';
+    const statusParameter = 'Em análise';
 
     try {
       const underReviewAnalysisList = await Analysis.find({ status: statusParameter });
@@ -110,7 +111,7 @@ class AnalysisController {
         return res.status(404).send({ message: 'Nenhuma analise encontrada com o ID informado' });
       }
 
-      if (!(analysis.status === 'Em Análise')) {
+      if (analysis.status !== 'Em análise') {
         return res.status(400).send({ message: `O status da análise esta '${analysis.status}' e não pode ser atualizado.` });
       }
 
@@ -119,6 +120,9 @@ class AnalysisController {
 
       return res.status(204).set('Location', `/admin/analysis/${analysis._id}`).send();
     } catch (error) {
+      if (error.name === 'CastError') {
+        return res.status(422).send({ message: 'O id informado é inválido, favor informe um id compatível com o tipo ObjectID' });
+      }
       return res.status(500).send({ message: error.message });
     }
   };
