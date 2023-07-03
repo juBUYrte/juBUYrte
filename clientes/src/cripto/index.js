@@ -1,39 +1,22 @@
-import { randomBytes, createCipheriv, createDecipheriv } from 'crypto';
+import ncrypt from 'ncrypt-js';
 
-const algorithm = 'aes-256-cbc';
+const _secretKey = 'KAJSGHDHJASGDJAGSHDGASHGDHJQWTEDQTYWDRFTQWRDTQYWRDFYTQWFDTYQWFDGQHWDFQHGWFDHGQWFDHQWFHGDHG';
 
-// Defining key
-const key = randomBytes(32);
-
-// Defining iv
-const iv = randomBytes(16);
+// eslint-disable-next-line new-cap
+const ncryptObject = new ncrypt(_secretKey);
 
 function encrypt(text) {
-  const cipher = createCipheriv(algorithm, Buffer.from(key), iv);
-
-  let encrypted = cipher.update(text);
-
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-
-  return {
-    iv: iv.toString('hex'),
-    encryptedData: encrypted.toString('hex'),
-  };
+  const encryptedData = ncryptObject.encrypt(text);
+  return encryptedData;
 }
-
-const output = encrypt('ZE PINDOLA CARALHO');
 
 function decrypt(text) {
-  const ivi = Buffer.from(text.iv, 'hex');
-  const encryptedText = Buffer.from(text.encryptedData, 'hex');
+  const decryptedData = ncryptObject.decrypt(text);
 
-  const decipher = createDecipheriv(algorithm, Buffer.from(key), ivi);
-
-  let decrypted = decipher.update(encryptedText);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-
-  return decrypted.toString();
+  return decryptedData;
 }
 
-console.log(output);
-console.log(decrypt(output));
+export {
+  encrypt,
+  decrypt,
+};

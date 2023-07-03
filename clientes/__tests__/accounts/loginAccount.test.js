@@ -16,8 +16,8 @@ describe('Testes da rota de POST /accounts/login', () => {
   });
   it('A rota deve retornar um status 204 ao passar dados validos', async () => {
     const object = {
-      email: 'usuario3@mail.com',
-      senha: '1234',
+      email: 'admin@mail.com',
+      senha: 'admin',
     };
     await request(app)
       .post('/api/accounts/login')
@@ -36,8 +36,8 @@ describe('Testes da rota de POST /accounts/login', () => {
   });
   it('A rota deve retornar um token', async () => {
     const object = {
-      email: 'usuario3@mail.com',
-      senha: '1234',
+      email: 'admin@mail.com',
+      senha: 'admin',
     };
     const req = await request(app)
       .post('/api/accounts/login')
