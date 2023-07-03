@@ -1,45 +1,39 @@
-const crypto = require('crypto');
+import { randomBytes, createCipheriv, createDecipheriv } from 'crypto';
 
 const algorithm = 'aes-256-cbc';
-const key = crypto.randomBytes(32);
-const iv = crypto.randomBytes(16);
+
+// Defining key
+const key = randomBytes(32);
+
+// Defining iv
+const iv = randomBytes(16);
 
 function encrypt(text) {
-  // Creating Cipheriv with its parameter
-  const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
+  const cipher = createCipheriv(algorithm, Buffer.from(key), iv);
 
-  // Updating text
   let encrypted = cipher.update(text);
 
-  // Using concatenation
   encrypted = Buffer.concat([encrypted, cipher.final()]);
 
-  // Returning iv and encrypted data
   return {
     iv: iv.toString('hex'),
     encryptedData: encrypted.toString('hex'),
   };
 }
 
-// Displays output
-const output = encrypt('MACAXEIRA PRETA');
-//  console.log(output);
+const output = encrypt('ZE PINDOLA CARALHO');
 
-// A decrypt function
 function decrypt(text) {
-  const iv = Buffer.from(text.iv, 'hex');
+  const ivi = Buffer.from(text.iv, 'hex');
   const encryptedText = Buffer.from(text.encryptedData, 'hex');
 
-  // Creating Decipher
-  const decipher = crypto.createDecipheriv(algorithm, Buffer.from(key), iv);
+  const decipher = createDecipheriv(algorithm, Buffer.from(key), ivi);
 
-  // Updating encrypted text
   let decrypted = decipher.update(encryptedText);
   decrypted = Buffer.concat([decrypted, decipher.final()]);
 
-  // returns data after decryption
   return decrypted.toString();
 }
 
-console.log(output.encryptedData);
+console.log(output);
 console.log(decrypt(output));
