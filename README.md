@@ -25,6 +25,12 @@ Cada microsserviço tem sua própria porta:
 
 Os testes desse projeto foram feitos utilizando o [JEST](https://jestjs.io/pt-BR/). Para rodar os testes basta utilizar o comando `npm test`.
 
+Testes do Microsserviço de Clientes <br />
+![Testes de Clientes](https://github.com/juBUYrte/juBUYrte/assets/96724885/af160124-c0f9-4a91-808e-59b3582445ff)
+
+Testes do Microsserviço de Antifraude
+![Testes de ANtifraude](https://i.imgur.com/tpbp1gd.png)
+
 </details>
 
 <br><br>
