@@ -8,7 +8,7 @@ import goToken from '../authentication/auth.js';
 dotenv.config();
 class AccountController {
   static loginAccount = async (req, res, next) => {
-    passport.authenticate('local', { session: false }, (err, user, _) => {
+    passport.authenticate('local', { session: false }, (err, user) => {
       if (err) {
         return next(err);
       }
