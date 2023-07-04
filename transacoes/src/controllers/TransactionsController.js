@@ -15,13 +15,17 @@ class TransactionsController {
       }
       return res.status(200).json(transactions);
     });
-  }
+  };
 
   static createTransaction = async (req, res) => {
     const { valor, dadosDoCartao } = req.body;
 
+    if (!valor || !dadosDoCartao) {
+      return res.status(422).send({ message: 'Invalid body' });
+    }
+
     try {
-      const tokenClient = await createToken(3001, "clientes");
+      const tokenClient = await createToken(3001, 'clientes');
       if (typeof tokenClient !== 'string') {
         return;
       }
@@ -37,7 +41,8 @@ class TransactionsController {
       }
 
       let status = '';
-      valor >= rent * 0.5 ? status = 'Em análise' : status = 'Aprovada';
+      if (valor >= rent * 0.5) status = 'Em análise';
+      if (valor < rent * 0.5) status = 'Aprovada';
 
       const transaction = new Transaction({ valor, idUser, status });
       const response = await transaction.save();
@@ -51,7 +56,7 @@ class TransactionsController {
         }
 
         const token = req.headers.authorization;
-        res.set('Location', `/api/admin/transactions/${idTransaction}`)
+        res.set('Location', `/api/admin/transactions/${idTransaction}`);
         res.set('Authorization', token);
         return res.status(303).end();
       }
@@ -73,7 +78,7 @@ class TransactionsController {
         return res.status(404).json({ message: 'ID not found' });
       }
 
-      let responseBody = {
+      const responseBody = {
         _id: transaction._id,
         valor: transaction.valor,
         idUser: transaction.idUser,
@@ -82,22 +87,22 @@ class TransactionsController {
 
       if (transaction.status === 'Em análise') {
         responseBody._links = {
-          "self": {
+          self: {
             method: 'GET',
             href: `${URL}/analysis/${transaction._id}`,
           },
-          "Aprovar": {
+          Aprovar: {
             method: 'PATCH',
             obs: 'O método deve ser chamado pela API anti-fraude',
             href: `${URL}/analysis/${transaction._id}`,
-            body: { status: 'Aprovada' }
+            body: { status: 'Aprovada' },
           },
-          "Rejeitar": {
+          Rejeitar: {
             method: 'PATCH',
             obs: 'O método deve ser chamado pela API anti-fraude',
             href: `${URL}/analysis/${transaction._id}`,
-            body: { status: 'Rejeitada' }
-          }
+            body: { status: 'Rejeitada' },
+          },
         };
       }
       return res.status(200).json(responseBody);
@@ -119,14 +124,14 @@ class TransactionsController {
         return res.status(405).send({ message: 'Not allowed' });
       }
 
-      Transaction.findByIdAndUpdate(id, { $set: { status } }, (err, _) => {
-        if (err) {
-          return res.status(500).send({ message: err.message });
+      Transaction.findByIdAndUpdate(id, { $set: { status } }, (error) => {
+        if (error) {
+          return res.status(500).send({ message: error.message });
         }
         return res.sendStatus(204);
       });
     });
-  }
+  };
 
   static deleteById = async (req, res) => {
     try {
