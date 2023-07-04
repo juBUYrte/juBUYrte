@@ -8,12 +8,12 @@ import goToken from '../authentication/auth.js';
 dotenv.config();
 class AccountController {
   static loginAccount = async (req, res, next) => {
-    passport.authenticate('local', { session: false }, (err, user, info) => {
+    passport.authenticate('local', { session: false }, (err, user) => {
       if (err) {
         return next(err);
       }
       if (!user) {
-        res.status(400).json({ message: info.message });
+        return res.status(404).json({ message: 'User not found' });
       }
       const token = goToken(user._id);
       return res.status(204).header('Authorization', `Bearer ${token}`).send();
@@ -36,40 +36,64 @@ class AccountController {
         return res.status(500).send({ message: err.message });
       }
       if (!account) {
-        return res.status(404).json();
+        return res.status(404).json({ message: 'ID not found' });
       }
       return res.status(200).json(account);
     });
   };
 
   static createAccount = async (req, res) => {
-    const salt = 12;
-    const hasPassword = bcrypt.hashSync(req.body.senha, salt);
-    req.body.senha = hasPassword;
+    const { nome, email, senha } = req.body;
+
+    const userEmail = await Account.findOne({ email });
+    if (userEmail) {
+      return res.status(409).json({ message: 'Email already exists' });
+    }
+
+    if (!nome || !email || !senha) {
+      return res.status(422).json({ message: 'Invalid body' });
+    }
+
+    const salt = await bcrypt.genSalt(12);
+    const hashSenha = await bcrypt.hash(senha, salt);
 
     const account = new Account({
-      ...req.body,
+      nome,
+      email,
+      senha: hashSenha,
       createdDate: Date(),
     });
-    account.save((err, newAccount) => {
-      if (err) {
-        return res.status(500).send({ message: err.message });
-      }
-      return res.status(201).set('Location', `/admin/accounts/${account.id}`).json(newAccount);
-    });
+
+    try {
+      await account.save();
+      return res.status(201).set('Location', `/admin/accounts/${account.id}`).json(account);
+    } catch (error) {
+      return res.status(500).send({ message: error.message });
+    }
   };
 
-  static updateAccount = (req, res) => {
+  static updateAccount = async (req, res) => {
     const { id } = req.params;
+
+    if (req.body.email) {
+      const user = await Account.findOne({ email: req.body.email });
+      if (user && user._id.toString() !== id) {
+        return res.status(409).json({ message: 'Email already exists' });
+      }
+    }
+
     if (req.body.senha) {
       const salt = 12;
-      const hasPassword = bcrypt.hashSync(req.body.senha, salt);
-      req.body.senha = hasPassword;
+      const hashSenha = bcrypt.hashSync(req.body.senha, salt);
+      req.body.senha = hashSenha;
     }
 
     Account.findByIdAndUpdate(id, { $set: req.body }, { new: true }, (err, account) => {
       if (err) {
         return res.status(500).send({ message: err.message });
+      }
+      if (!account) {
+        return res.status(404).json({ message: 'ID not found' });
       }
       return res.status(204).set('Location', `/admin/accounts/${account.id}`).send();
     });
@@ -78,9 +102,12 @@ class AccountController {
   static deleteAccount = (req, res) => {
     const { id } = req.params;
 
-    Account.findByIdAndDelete(id, (err) => {
+    Account.findByIdAndDelete(id, (err, account) => {
       if (err) {
         return res.status(500).send({ message: err.message });
+      }
+      if (!account) {
+        return res.status(404).json({ message: 'ID not found' });
       }
       return res.status(204).send({ message: 'Account successfully deleted' });
     });

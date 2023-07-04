@@ -43,5 +43,15 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: secret
 
+  api-gateway:
+    build: api-gateway
+    ports: 
+      - 8080:80
+    depends_on:
+      - anti-fraude
+      - clientes
+      - transacoes
+
 volumes:
   vol-mongo-anti-fraude:
+  
