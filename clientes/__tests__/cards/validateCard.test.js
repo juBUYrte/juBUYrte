@@ -48,7 +48,6 @@ describe('Testes da rota de POST /api/admin/users/cards', () => {
     await request(app).post('/api/admin/users/cards')
       .set({ Authorization: `Bearer ${tokenAcess}` }).send(invalidCard)
       .expect(409);
-    // expect(resp.status).toBe(409);
   });
   it('Deve retornar um erro 400, quando o body é inválido', async () => {
     const invalidCard = {
