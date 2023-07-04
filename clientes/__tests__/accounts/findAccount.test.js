@@ -19,7 +19,7 @@ describe('Testes da rota de GET /api/admin/accounts', () => {
   it('A rota deve retornar um array de objetos', async () => {
     const req = await request(app).get('/api/admin/accounts')
       .set({ Authorization: `Bearer ${tokenAcess}` });
-    // a resposta deve ser um array
+
     expect(Array.isArray(req.body)).toBe(true);
     req.body.forEach((dados) => {
       expect(typeof dados).toEqual('object');

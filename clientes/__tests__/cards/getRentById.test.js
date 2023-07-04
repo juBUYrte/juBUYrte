@@ -44,6 +44,6 @@ describe('Testes da rota de GET /api/admin/users/cards/id', () => {
 
     const resp = await request(app).get(`/api/admin/users/cards/${id}`)
       .set({ Authorization: `Bearer ${tokenAcess}` });
-    expect(resp.status).toBe(404); 
+    expect(resp.status).toBe(404);
   });
 });
