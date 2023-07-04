@@ -1,0 +1,227 @@
+{
+	"info": {
+		"name": "Transações - Fluxo 1",
+		"_postman_id": "5098a196-a6cb-fb31-d60e-5a43e45fbf33",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Transações - Aprovação Direta",
+			"description": "",
+			"item": [
+				{
+					"name": "Transactions",
+					"description": "",
+					"item": [
+						{
+							"name": "addTransaction",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0OWMzZTJmYWMwODI0YTg4Mzc2ZjllNyIsImlhdCI6MTY4ODQxNDc2OCwiZXhwIjoxNjg4NDU3OTY4fQ.3Cc_Tur2sHYVUut1akAU7XLrh_L2OdslQ7sOmaMrsJE",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"dadosDoCartao\": {\r\n\t\t\"numero\": \"1234432156788765\",\r\n\t\t\"nome\": \"Ana C Lima\",\r\n\t\t\"validade\": \"12/30\",\r\n\t\t\"codigo\": \"789\"\r\n},\r\n\t\"valor\": 1023.21\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3002/api/admin/transactions",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3002",
+									"path": [
+										"api",
+										"admin",
+										"transactions"
+									]
+								},
+								"description": ""
+							},
+							"response": [
+								{
+									"id": "5178e528-2afb-4f19-8988-b1a0732d81dd",
+									"name": "addTransaction",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\t\"dadosDoCartao\": {\r\n\t\t\"numero\": \"1234432156788765\",\r\n\t\t\"nome\": \"Ana C Lima\",\r\n\t\t\"validade\": \"12/30\",\r\n\t\t\"codigo\": \"789\"\r\n},\r\n\t\"valor\": 1023.21\r\n}"
+										},
+										"url": {
+											"raw": "http://localhost:3002/api/admin/transactions",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "3002",
+											"path": [
+												"api",
+												"admin",
+												"transactions"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"_postman_previewtype": "text",
+									"header": [
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*",
+											"name": "Access-Control-Allow-Origin",
+											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive",
+											"name": "Connection",
+											"description": "Options that are desired for the connection"
+										},
+										{
+											"key": "Content-Length",
+											"value": "54",
+											"name": "Content-Length",
+											"description": "The length of the response body in octets (8-bit bytes)"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8",
+											"name": "Content-Type",
+											"description": "The mime type of this content"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 03 Jul 2023 20:39:57 GMT",
+											"name": "Date",
+											"description": "The date and time that the message was sent"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"36-7y+iimaVmROV2C/oezBfUXXvxlI\"",
+											"name": "ETag",
+											"description": "An identifier for a specific version of a resource, often a message digest"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5",
+											"name": "Keep-Alive",
+											"description": "Custom header"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "Express",
+											"name": "X-Powered-By",
+											"description": "Specifies the technology (ASP.NET, PHP, JBoss, e.g.) supporting the web application (version details are often in X-Runtime, X-Version, or X-AspNet-Version)"
+										}
+									],
+									"cookie": [],
+									"responseTime": 296,
+									"body": "{\"_id\":\"64a3321d2cdb12abff2f3332\",\"status\":\"Aprovada\"}"
+								}
+							]
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Accounts",
+					"description": "",
+					"item": [
+						{
+							"name": "Login",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"sam@example.com\",\r\n  \"senha\": \"0123456\"\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3002/api/accounts/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3002",
+									"path": [
+										"api",
+										"accounts",
+										"login"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "addAccount",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"nome\": \"Sam\",\r\n  \"email\": \"sam@example.com\",\r\n  \"senha\": \"0123456\"\r\n \r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3002/api/admin/accounts",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3002",
+									"path": [
+										"api",
+										"admin",
+										"accounts"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		}
+	]
+}

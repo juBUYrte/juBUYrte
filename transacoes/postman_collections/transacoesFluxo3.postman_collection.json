@@ -1,0 +1,249 @@
+{
+	"info": {
+		"name": "Transações - Fluxo 3",
+		"_postman_id": "e54a11bf-4f27-0ac9-99f9-4576879d08c4",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Transações - Rejeição Anti-Fraude",
+			"description": "",
+			"item": [
+				{
+					"name": "Fluxo",
+					"description": "",
+					"item": [
+						{
+							"name": "addTransaction",
+							"request": {
+								"auth": {
+									"type": "bearer"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"dadosDoCartao\": {\r\n\t\t\"numero\": \"1234432156788765\",\r\n\t\t\"nome\": \"Ana C Lima\",\r\n\t\t\"validade\": \"12/30\",\r\n\t\t\"codigo\": \"789\"\r\n},\r\n\t\"valor\": 10023.22\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3002/api/admin/transactions",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3002",
+									"path": [
+										"api",
+										"admin",
+										"transactions"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "deniedTransaction",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YTMzMzFhMzYzOWYzMTZhZTIxYjUyOCIsImlhdCI6MTY4ODQxNzA3MywiZXhwIjoxNjkwMTQ1MDczfQ.kgf3oBRcA5CDK7HCVpBLW_8ufoW30pzQ78WkNkt3JJA",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n \"status\": \"Rejeitada\"\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/admin/analysis/64a333ea2cdb12abff2f3346",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"admin",
+										"analysis",
+										"64a333ea2cdb12abff2f3346"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Accounts Transactions",
+					"description": "",
+					"item": [
+						{
+							"name": "loginTransactions",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"taynara@admin.com\",\r\n  \"senha\": \"123456\"\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3002/api/accounts/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3002",
+									"path": [
+										"api",
+										"accounts",
+										"login"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "addAccountTransactions",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"nome\": \"Taynara\",\r\n\t\"email\": \"taynara@admin.com\",\r\n\t\"senha\": \"123456\"\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3002/api/admin/accounts",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3002",
+									"path": [
+										"api",
+										"admin",
+										"accounts"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Accounts Anti-Fraud",
+					"description": "",
+					"item": [
+						{
+							"name": "addAccountAntiFraud",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"nome\": \"Taynara\",\r\n\t\"email\": \"taynara@admin.com\",\r\n\t\"senha\": \"123456\"\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/admin/accounts",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"admin",
+										"accounts"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "loginAntiFraud",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"taynara@admin.com\",\r\n  \"senha\": \"123456\"\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/accounts/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"accounts",
+										"login"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		}
+	]
+}

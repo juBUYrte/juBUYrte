@@ -1,0 +1,344 @@
+{
+	"info": {
+		"name": "Transações - Fluxo 2",
+		"_postman_id": "ad19ab39-e02e-a80d-82e2-b19444626e49",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Transações - Aprovação Anti-Fraude",
+			"description": "",
+			"item": [
+				{
+					"name": "Fluxo",
+					"description": "",
+					"item": [
+						{
+							"name": "addTransaction",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0OWMzZTJmYWMwODI0YTg4Mzc2ZjllNyIsImlhdCI6MTY4ODQxNDc2OCwiZXhwIjoxNjg4NDU3OTY4fQ.3Cc_Tur2sHYVUut1akAU7XLrh_L2OdslQ7sOmaMrsJE",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"dadosDoCartao\": {\r\n\t\t\"numero\": \"1234432156788765\",\r\n\t\t\"nome\": \"Ana C Lima\",\r\n\t\t\"validade\": \"12/30\",\r\n\t\t\"codigo\": \"789\"\r\n},\r\n\t\"valor\": 10023.22\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3002/api/admin/transactions",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3002",
+									"path": [
+										"api",
+										"admin",
+										"transactions"
+									]
+								},
+								"description": ""
+							},
+							"response": [
+								{
+									"id": "351a46f1-6a73-48b3-a698-f890dd289057",
+									"name": "addTransaction",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\t\"dadosDoCartao\": {\r\n\t\t\"numero\": \"1234432156788765\",\r\n\t\t\"nome\": \"Ana C Lima\",\r\n\t\t\"validade\": \"12/30\",\r\n\t\t\"codigo\": \"789\"\r\n},\r\n\t\"valor\": 10023.22\r\n}"
+										},
+										"url": {
+											"raw": "http://localhost:3002/api/admin/transactions",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "3002",
+											"path": [
+												"api",
+												"admin",
+												"transactions"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"_postman_previewtype": "text",
+									"header": [
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*",
+											"name": "Access-Control-Allow-Origin",
+											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive",
+											"name": "Connection",
+											"description": "Options that are desired for the connection"
+										},
+										{
+											"key": "Content-Length",
+											"value": "600",
+											"name": "Content-Length",
+											"description": "The length of the response body in octets (8-bit bytes)"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8",
+											"name": "Content-Type",
+											"description": "The mime type of this content"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 03 Jul 2023 20:42:44 GMT",
+											"name": "Date",
+											"description": "The date and time that the message was sent"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"258-vvVC37AJgOTA38xUhRqOCSRoNvQ\"",
+											"name": "ETag",
+											"description": "An identifier for a specific version of a resource, often a message digest"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5",
+											"name": "Keep-Alive",
+											"description": "Custom header"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "Express",
+											"name": "X-Powered-By",
+											"description": "Specifies the technology (ASP.NET, PHP, JBoss, e.g.) supporting the web application (version details are often in X-Runtime, X-Version, or X-AspNet-Version)"
+										}
+									],
+									"cookie": [],
+									"responseTime": 882,
+									"body": "{\"_id\":\"64a332c32cdb12abff2f3336\",\"valor\":10023.22,\"idUser\":\"64a331b1b017f0f774b693bc\",\"status\":\"Em análise\",\"_links\":{\"self\":{\"method\":\"GET\",\"href\":\"http://localhost:3000/api/admin/analysis/64a332c32cdb12abff2f3336\"},\"Aprovar\":{\"method\":\"PATCH\",\"obs\":\"O método deve ser chamado pela API anti-fraude\",\"href\":\"http://localhost:3000/api/admin/analysis/64a332c32cdb12abff2f3336\",\"body\":{\"status\":\"Aprovada\"}},\"Rejeitar\":{\"method\":\"PATCH\",\"obs\":\"O método deve ser chamado pela API anti-fraude\",\"href\":\"http://localhost:3000/api/admin/analysis/64a332c32cdb12abff2f3336\",\"body\":{\"status\":\"Rejeitada\"}}}}"
+								}
+							]
+						},
+						{
+							"name": "approvedTransaction",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YTMzMzFhMzYzOWYzMTZhZTIxYjUyOCIsImlhdCI6MTY4ODQxNzA3MywiZXhwIjoxNjkwMTQ1MDczfQ.kgf3oBRcA5CDK7HCVpBLW_8ufoW30pzQ78WkNkt3JJA",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n \"status\": \"Aprovada\"\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/admin/analysis/64a332c32cdb12abff2f3336",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"admin",
+										"analysis",
+										"64a332c32cdb12abff2f3336"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Accounts Transactions",
+					"description": "",
+					"item": [
+						{
+							"name": "loginTransactions",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"taynara@admin.com\",\r\n  \"senha\": \"123456\"\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3002/api/accounts/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3002",
+									"path": [
+										"api",
+										"accounts",
+										"login"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "addAccountTransactions",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"nome\": \"Taynara\",\r\n\t\"email\": \"taynara@admin.com\",\r\n\t\"senha\": \"123456\"\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3002/api/admin/accounts",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3002",
+									"path": [
+										"api",
+										"admin",
+										"accounts"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Accounts Anti-Fraud",
+					"description": "",
+					"item": [
+						{
+							"name": "addAccountAntiFraud",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t \"nome\": \"Sam\",\r\n  \"email\": \"sam@example.com\",\r\n  \"senha\": \"0123456\"\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/admin/accounts",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"admin",
+										"accounts"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "loginAntiFraud",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"sam@example.com\",\r\n  \"senha\": \"0123456\"\r\n}"
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/accounts/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"accounts",
+										"login"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		}
+	]
+}
